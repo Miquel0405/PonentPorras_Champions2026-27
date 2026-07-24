@@ -1,0 +1,11 @@
+$kind: http-request
+url: "{{base_url}}/equipos/"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"nombre\": \"FC Barcelona\"\r
+
+    }"
+order: 1093765363291592

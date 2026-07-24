@@ -1,0 +1,11 @@
+$kind: http-request
+url: "{{base_url}}/equipos/2/"
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"nombre\": \"Barcelona\"\r
+
+    }"
+order: 4017641809836015

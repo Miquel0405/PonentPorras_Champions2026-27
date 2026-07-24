@@ -1,0 +1,6 @@
+$kind: collection
+auth:
+  - id: 982b90ba-7b21-402c-81cc-5b14ee391577
+    type: noauth
+    name: No Auth
+order: 3000
