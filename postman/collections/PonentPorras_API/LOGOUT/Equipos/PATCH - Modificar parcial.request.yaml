@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{base_url}}/equipos/2/"
+method: PATCH
+order: 4406513107608111

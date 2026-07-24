@@ -1,0 +1,7 @@
+from .equipo import EquipoSerializer
+from .pais import PaisSerializer
+from .partido_real import PartidoRealSerializer, PartidoRealDetailSerializer
+from .participante import ParticipanteSerializer, ParticipanteDetailSerializer
+from .prediccion import PrediccionSerializer
+from .prediccion_detalle import PrediccionPartidoSerializer, PrediccionParticipanteSerializer
+from .clasificacion import ClasificacionSerializer

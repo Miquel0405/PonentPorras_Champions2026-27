@@ -1,0 +1,95 @@
+
+.page-banner {
+  margin-bottom: 24px;
+  padding: 28px;
+  color: var(--color-text-on-dark);
+  background: linear-gradient(
+    120deg,
+    var(--color-navy),
+    var(--color-champions-blue)
+  );
+  border-radius: var(--radius-banner);
+}
+
+.page-banner h1 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.page-banner p {
+  margin: 0;
+  color: #C7D5F0;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  color: white;
+  background: var(--color-navy);
+}
+
+.navbar a {
+  color: #D8E3F7;
+}
+
+.navbar a.active {
+  color: white;
+  font-weight: 700;
+}
+
+.sidebar {
+  color: white;
+  background: var(--color-navy);
+}
+
+.sidebar a {
+  display: block;
+  padding: 12px 16px;
+  color: #D8E3F7;
+  border-radius: 8px;
+}
+
+.sidebar a.active {
+  color: white;
+  background: var(--color-primary);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table th {
+  color: white;
+  background: var(--color-navy);
+}
+
+.data-table tbody tr:hover {
+  background: var(--color-hover);
+}
+
+.rank-first {
+  color: #80601A;
+  font-weight: 800;
+}
+
+@media (max-width: 640px) {
+  .page-banner {
+    padding: 20px;
+  }
+
+  .page-banner h1 {
+    font-size: 24px;
+  }
+}

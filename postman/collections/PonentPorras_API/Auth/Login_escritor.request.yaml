@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{base_url}}/auth/token/"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"username\": \"escritor\",\r
+
+    \    \"password\": \"writer_0001\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "const json = pm.response.json();\r
+
+      \r
+
+      pm.environment.set(\"access\", json.access);\r
+
+      pm.environment.set(\"refresh\", json.refresh);"
+    language: text/javascript
+order: 1790012436273

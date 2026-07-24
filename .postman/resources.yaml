@@ -1,0 +1,9 @@
+workspace:
+  id: b6bdeea8-dbd8-4b31-8be8-f6329208e872
+cloudResources:
+  collections:
+    ../postman/collections/PonentPorras_API: 6ab5662e3d8d083dfef2b4c1
+  environments:
+    ../postman/environments/PonentPorras - Local.environment.yaml: 58065910-5befadf6-a709-49dd-a64f-bf269f0f898a
+  globals:
+    ../postman/globals/workspace.globals.yaml: a6ae3724-e6cd-46bd-859d-aaa7a886a8e6
