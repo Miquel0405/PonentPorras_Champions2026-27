@@ -1,11 +1,14 @@
 
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
+import { useState } from "react";
 
 import GlobalBanner from "./GlobalBanner";
 import GlobalSidebar from "./GlobalSidebar";
 
 function GlobalLayout() {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
     return (
         <Box
             sx={{
@@ -13,9 +16,17 @@ function GlobalLayout() {
                 // backgroundColor: "#F3F6FC",
             }}
         >
-            <GlobalBanner />
+            <GlobalBanner
+                menuOpen={sidebarOpen}
+                onMenuToggle={() => setSidebarOpen((open) => !open)}
+            />
 
-            <GlobalSidebar />
+            <GlobalSidebar
+                open={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                onToggle={() => setSidebarOpen((open) => !open)}
+                onOpen={() => setSidebarOpen(true)}
+            />
 
             <Box
                 component="main"

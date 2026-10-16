@@ -3,37 +3,73 @@ import {
     Box,
     Paper,
     Typography,
+    Button,
+    Stack,
 } from "@mui/material";
-
+import BackIcon from "@mui/icons-material/ArrowBack";
+import { Link} from "react-router-dom";
 import Clasificacion from "../components/clasificacion/Clasificacion";
 
 function ClasificacionPage() {
     return (
         <Box>
-            <Box sx={{ mb: 3 }}>
-                <Typography
-                    component="h1"
+            <Stack
+                direction={{ xs: "column", sm: "row" }}
+                alignItems={{ xs: "stretch", sm: "center" }}
+                justifyContent="space-between"
+                spacing={2}
+                sx={{ mb: 3, position: "relative"}}
+            >
+                <Box
                     sx={{
-                        mb: 0.75,
-                        color: "#07152F",
-                        fontSize: { xs: "1.6rem", md: "2rem" },
-                        fontWeight: 800,
-                        lineHeight: 1.2,
+                        position : "absolute",
+                        top: 0,
+                        right: 0,
                     }}
                 >
-                    Clasificación
-                </Typography>
+                    <Button
+                        component={Link}
+                        to="/"
+                        variant="outlined"
+                        startIcon={<BackIcon />}
+                        sx={{
+                            color: "#F3F6FC",
+                            borderColor: "#123C82",
+                            borderRadius: "8px",
+                            textTransform: "none",
+                            fontWeight: 700,
+                            "&:hover": {
+                                backgroundColor: "#3478F6",
+                            },
+                        }}
+                    >
+                        Tornar al inici
+                    </Button>
+                </Box>
+                <Box sx={{ mb: 3 }}>
+                    <Typography
+                        component="h1"
+                        sx={{
+                            mb: 0.75,
+                            color: "#FFFFFF",
+                            fontSize: { xs: "1.6rem", md: "2rem" },
+                            fontWeight: 800,
+                            lineHeight: 1.2,
+                        }}
+                    >
+                        Clasificació
+                    </Typography>
 
-                <Typography
-                    sx={{
-                        color: "#53627A",
-                        fontSize: "0.95rem",
-                    }}
-                >
-                    Consulta los puntos y la posición de cada participante.
-                </Typography>
-            </Box>
-
+                    <Typography
+                        sx={{
+                            color: "#eaf1ffdb",
+                            fontSize: "0.95rem",
+                        }}
+                    >
+                        Consulta la clasificació completa amb més detall o entra als detalls de un participant.
+                    </Typography>
+                </Box>
+            </Stack>
             <Paper
                 elevation={0}
                 sx={{

@@ -1,10 +1,9 @@
 from rest_framework import generics
 from rest_framework.response import Response
 
-from ..permissions import IsAdminOrReadOnly
 from ..serializers import ClasificacionSerializer
 from ..services.clasificacion import obtener_clasificacion
-
+from ..permissions import IsAdminOrReadOnly
 
 class ClasificacionView(generics.GenericAPIView):
     serializer_class = ClasificacionSerializer
@@ -12,7 +11,7 @@ class ClasificacionView(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         clasificacion = obtener_clasificacion()
-
         serializer = self.get_serializer(clasificacion, many=True)
+        datos = serializer.data     
 
-        return Response(serializer.data)
+        return Response(datos)

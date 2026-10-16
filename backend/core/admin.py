@@ -6,14 +6,12 @@ from .models import (
     Equipo,
     PartidoReal,
     Participante,
-    Prediccion,
-    Pais,
+    Pronostico,
 )
 
 
 admin.site.register(Equipo)
 admin.site.register(PartidoReal)
 admin.site.register(Participante)
-admin.site.register(Prediccion)
-admin.site.register(Pais)
+admin.site.register(Pronostico)
 admin.site.site_header = "Ponent Porras Admin"

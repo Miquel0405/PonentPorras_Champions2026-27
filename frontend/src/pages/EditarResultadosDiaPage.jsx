@@ -1,6 +1,3 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-
 import {
     Alert,
     Box,
@@ -11,120 +8,82 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { getPartidos, guardarResultadosDia } from "../api/api";
 import EscudoEquipo from "../components/partidos/EscudoEquipo";
 
-
-const obtenerClaveDia = (fecha) => {
-    const fechaPartido = new Date(fecha);
-
-    const año = fechaPartido.getFullYear();
-    const mes = String(fechaPartido.getMonth() + 1).padStart(2, "0");
-    const dia = String(fechaPartido.getDate()).padStart(2, "0");
-
-    return `${año}-${mes}-${dia}`;
-};
-
-const formatearDia = (fecha) => {
-    const [año, mes, dia] = fecha.split("-");
-
-    return new Date(
-        Number(año),
-        Number(mes) - 1,
-        Number(dia),
-        12
-    ).toLocaleDateString("es-ES", {
+function formatearFecha(fecha) {
+    const [year, month, day] = fecha.split("-").map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString("cat-ES", {
         weekday: "long",
         day: "numeric",
         month: "long",
         year: "numeric",
     });
-};
+}
 
-const formatearHora = (fecha) => {
-    return new Date(fecha).toLocaleTimeString("es-ES", {
-        hour: "2-digit",
-        minute: "2-digit",
-    });
-};
+function extraerMensajeError(error) {
+    const datos = error.response?.data;
+    if (!datos) return "No s'han pogut guardar els resultats.";
+    if (typeof datos === "string") return datos;
 
-const obtenerMensajeError = (error) => {
-    const detalle = error.response?.data?.detail;
+    const extraerMensajes = (valor) => {
+        if (typeof valor === "string") return [valor];
+        if (Array.isArray(valor)) return valor.flatMap(extraerMensajes);
+        if (valor && typeof valor === "object") {
+            return Object.values(valor).flatMap(extraerMensajes);
+        }
+        return [];
+    };
 
-    if (detalle) {
-        return detalle;
-    }
+    const mensajes = extraerMensajes(datos);
+    return mensajes.length
+        ? mensajes.join(" ")
+        : "No s'han pogut guardar els resultats.";
+}
 
-    return "No se pudieron guardar los resultados. Inténtalo de nuevo.";
-};
-
-
-export default function EditarResultadosDiaPage() {
+function EditarResultadosDiaPage() {
     const { fecha } = useParams();
     const navigate = useNavigate();
 
     const [partidos, setPartidos] = useState([]);
-    const [valores, setValores] = useState({});
+    const [resultados, setResultados] = useState({});
     const [cargando, setCargando] = useState(true);
     const [guardando, setGuardando] = useState(false);
-    const [error, setError] = useState("");
-    const [erroresValidacion, setErroresValidacion] = useState({});
-    const [mensaje, setMensaje] = useState("");
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         let activo = true;
 
-        const cargarPartidos = async () => {
-            setCargando(true);
-            setError("");
-
-            try {
-                const datos = await getPartidos();
-
+        getPartidos({ fecha })
+            .then((datosPartidos) => {
                 if (!activo) return;
-
-                const partidosDelDia = datos
-                    .filter(
-                        (partido) =>
-                            obtenerClaveDia(partido.fecha) === fecha
+                setPartidos(datosPartidos);
+                setResultados(
+                    Object.fromEntries(
+                        datosPartidos.map((partido) => [
+                            partido.id,
+                            {
+                                goles_local: partido.goles_local,
+                                goles_visitante: partido.goles_visitante,
+                            },
+                        ])
                     )
-                    .sort(
-                        (a, b) =>
-                            new Date(a.fecha) - new Date(b.fecha)
-                    );
-
-                const valoresIniciales = {};
-
-                partidosDelDia.forEach((partido) => {
-                    valoresIniciales[partido.id] = {
-                        goles_local:
-                            partido.goles_local ?? "",
-                        goles_visitante:
-                            partido.goles_visitante ?? "",
-                    };
-                });
-
-                setPartidos(partidosDelDia);
-                setValores(valoresIniciales);
-            } catch (err) {
+                );
+            })
+            .catch((error) => {
+                console.error(error);
                 if (activo) {
-                    setError(
-                        "No se pudieron cargar los partidos. Comprueba la conexión con el servidor."
-                    );
+                    setError("No s'han pogut carregar els partits del dia.");
                 }
-            } finally {
-                if (activo) {
-                    setCargando(false);
-                }
-            }
-        };
-
-        cargarPartidos();
+            })
+            .finally(() => {
+                if (activo) setCargando(false);
+            });
 
         return () => {
             activo = false;
@@ -132,460 +91,281 @@ export default function EditarResultadosDiaPage() {
     }, [fecha]);
 
     const handleChange = (partidoId, campo, valor) => {
-        setValores((actuales) => ({
+        setResultados((actuales) => ({
             ...actuales,
             [partidoId]: {
                 ...actuales[partidoId],
                 [campo]: valor,
             },
         }));
-
-        setErroresValidacion((actuales) => ({
-            ...actuales,
-            [partidoId]: "",
-        }));
-
-        setMensaje("");
     };
 
     const handleGuardar = async () => {
-        setMensaje("");
-        setError("");
-
-        const nuevosErrores = {};
-        const resultados = [];
-
-        for (const partido of partidos) {
-            const valor = valores[partido.id];
-
-            const localVacio = valor.goles_local === "";
-            const visitanteVacio = valor.goles_visitante === "";
-
-            if (localVacio !== visitanteVacio) {
-                nuevosErrores[partido.id] =
-                    "Introduce los goles de ambos equipos o deja ambos campos vacíos.";
-                continue;
-            }
-
-            if (!localVacio) {
-                const golesLocal = Number(valor.goles_local);
-                const golesVisitante = Number(valor.goles_visitante);
-
-                if (
-                    !Number.isInteger(golesLocal) ||
-                    !Number.isInteger(golesVisitante) ||
-                    golesLocal < 0 ||
-                    golesVisitante < 0
-                ) {
-                    nuevosErrores[partido.id] =
-                        "Los goles deben ser números enteros no negativos.";
-                    continue;
-                }
-
-                resultados.push({
-                    partido_id: partido.id,
-                    goles_local: golesLocal,
-                    goles_visitante: golesVisitante,
-                });
-            } else {
-                resultados.push({
-                    partido_id: partido.id,
-                    goles_local: null,
-                    goles_visitante: null,
-                });
-            }
-        }
-
-        setErroresValidacion(nuevosErrores);
-
-        if (Object.keys(nuevosErrores).length > 0) {
-            setError(
-                "Revisa los resultados señalados antes de guardar."
-            );
-            return;
-        }
-
+        setError(null);
         setGuardando(true);
 
         try {
-            await guardarResultadosDia(fecha, resultados);
-            navigate("/partidos", {
-                state: {
-                    mensaje:
-                        "Los resultados del día se han guardado correctamente.",
-                },
-            });
-        } catch (err) {
-            setError(obtenerMensajeError(err));
+            await guardarResultadosDia(
+                fecha,
+                partidos.map((partido) => ({
+                    partido_id: partido.id,
+                    goles_local: resultados[partido.id]?.goles_local ?? null,
+                    goles_visitante:
+                        resultados[partido.id]?.goles_visitante ?? null,
+                }))
+            );
+            navigate("/partidos");
+        } catch (error) {
+            console.error(error);
+            setError(extraerMensajeError(error));
         } finally {
             setGuardando(false);
         }
     };
 
+    const campoGoles = (partidoId, campo, etiqueta) => (
+        <TextField
+            type="number"
+            size="small"
+            label={etiqueta}
+            value={resultados[partidoId]?.[campo] ?? ""}
+            onChange={(event) => {
+                const texto = event.target.value;
+                handleChange(
+                    partidoId,
+                    campo,
+                    texto === "" ? null : Number(texto)
+                );
+            }}
+            inputProps={{ min: 0, step: 1, inputMode: "numeric" }}
+            sx={{
+                width: { xs: 82, sm: 100 },
+                "& input": { textAlign: "center", fontWeight: 800 },
+            }}
+        />
+    );
+
     if (cargando) {
         return (
             <Box
                 sx={{
+                    minHeight: 240,
                     display: "flex",
                     justifyContent: "center",
-                    py: 8,
+                    alignItems: "center",
                 }}
             >
-                <CircularProgress />
+                <CircularProgress sx={{ color: "#3478F6" }} />
             </Box>
         );
     }
 
     return (
-        <Box
-            sx={{
-                maxWidth: 900,
-                mx: "auto",
-                px: { xs: 1.5, sm: 3 },
-                py: 3,
-            }}
-        >
-            <Stack spacing={3}>
+        <Box>
+            <Stack
+                direction={{ xs: "column", sm: "row" }}
+                alignItems={{ xs: "stretch", sm: "center" }}
+                justifyContent="space-between"
+                spacing={2}
+                sx={{ mb: 3, position: "relative"}}
+            >
                 <Box>
-                    <Button
-                        onClick={() => navigate("/partidos")}
-                        startIcon={<CloseOutlinedIcon />}
+                    <Typography
+                        component="h1"
                         sx={{
-                            mb: 1,
-                            textTransform: "none",
-                            color: "#53627A",
+                            color: "#FFFFFF",
+                            fontSize: { xs: "1.5rem", sm: "2rem" },
+                            fontWeight: 800,
                         }}
                     >
-                        Volver a los partidos
-                    </Button>
-
-                    <Stack
-                        direction="row"
-                        spacing={1.5}
-                        alignItems="center"
-                        sx={{ mb: 1 }}
-                    >
-                        <CalendarMonthIcon
-                            sx={{ color: "#3478F6", fontSize: 30 }}
-                        />
-
-                        <Typography
-                            variant="h5"
-                            component="h1"
-                            sx={{
-                                fontWeight: 800,
-                                color: "#07152F",
-                            }}
-                        >
-                            Resultados reales
-                        </Typography>
-                    </Stack>
-
+                        Editar resultats reals
+                    </Typography>
                     <Typography
-                        variant="body1"
                         sx={{
-                            color: "#53627A",
+                            color: "#DCE6F5",
+                            mt: 0.5,
                             textTransform: "capitalize",
                         }}
                     >
-                        {formatearDia(fecha)}
-                    </Typography>
-
-                    <Typography
-                        variant="body2"
-                        sx={{ color: "#53627A", mt: 0.5 }}
-                    >
-                        {partidos.length}{" "}
-                        {partidos.length === 1
-                            ? "partido"
-                            : "partidos"}
+                        {formatearFecha(fecha)}
                     </Typography>
                 </Box>
+                <Box
+                    sx={{
+                        position : "absolute",
+                        top: 0,
+                        right: 0,
+                    }}
+                >
+                    <Button
+                        component={Link}
+                        to="/partidos"
+                        variant="outlined"
+                        startIcon={<ArrowBackIcon />}
+                        disabled={guardando}
+                        sx={{
+                            backgroundColor: "#123C82",
+                            borderColor: "#FFFFFF",
+                            color: "#F3F6FC",
+                            borderRadius: "8px",
+                            textTransform: "none",
+                            fontWeight: 700,
+                            "&:hover": { backgroundColor: "#3478F6" },
+                        }}
+                    >
+                        Tornar als partits
+                    </Button>
+                </Box>
+                
+            </Stack>
 
-                {error && (
-                    <Alert severity="error">
-                        {error}
-                    </Alert>
-                )}
+            {error && (
+                <Alert severity="error" role="alert" sx={{ mb: 2 }}>
+                    {error}
+                </Alert>
+            )}
 
-                {mensaje && (
-                    <Alert severity="success">
-                        {mensaje}
-                    </Alert>
-                )}
-
+            <Stack spacing={1.5} sx={{ width: "100%" }}>
                 {partidos.length === 0 ? (
-                    <Alert severity="info">
-                        No hay partidos programados para esta fecha.
-                    </Alert>
+                    <Paper sx={{ p: 3, textAlign: "center", color: "#53627A" }}>
+                        No hi ha partits en aquesta data.
+                    </Paper>
                 ) : (
-                    <Stack spacing={2}>
-                        {partidos.map((partido) => {
-                            const valor = valores[partido.id] ?? {
-                                goles_local: "",
-                                goles_visitante: "",
-                            };
-
-                            const errorPartido =
-                                erroresValidacion[partido.id];
-
-                            return (
-                                <Paper
-                                    key={partido.id}
-                                    elevation={0}
-                                    sx={{
-                                        p: { xs: 1.5, sm: 2.5 },
-                                        border: "1px solid #E1E7F0",
-                                        borderRadius: "12px",
-                                        boxShadow:
-                                            "0 2px 8px rgba(7,21,47,0.04)",
+                    partidos.map((partido) => (
+                        <Paper
+                            key={partido.id}
+                            elevation={0}
+                            sx={{
+                                p: { xs: 2, sm: 3 },
+                                border: "1px solid #E1E7F0",
+                                borderRadius: "12px",
+                                boxShadow: "0 2px 10px rgb(7 21 47 / 5%)",
+                                display: "block",
+                                width: "100%",
+                                boxSizing: "border-box",
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    width: "100%",
+                                    height: "100%", // Obliga al contenedor a usar todo el alto disponible
+                                    display: { xs: "flex", sm: "grid" },
+                                    flexDirection: "column",
+                                    gridTemplateColumns: "1fr auto 1fr", 
+                                    // Forzamos el centrado vertical estricto de las 3 columnas principales respecto al Paper
+                                    alignItems: "center", 
+                                    justifyContent: "center",
+                                    justifyItems: "center",   
+                                    gap: { xs: 2, sm: 4 },
+                                }}
+                            >
+                                {/* 1. Equipo Local */}
+                                <Stack 
+                                    direction="row" 
+                                    // Asegura que el escudo y el texto compartan el mismo eje central vertical
+                                    alignItems="center" 
+                                    spacing={1.5}
+                                    sx={{ 
+                                        width: "100%",
+                                        height: "100%", // Se estira verticalmente para calcular el centro real
+                                        justifyContent: { xs: "center", sm: "flex-end" } 
                                     }}
                                 >
-                                    <Stack
-                                        direction="row"
-                                        alignItems="center"
-                                        justifyContent="space-between"
-                                        sx={{ mb: 2 }}
-                                    >
-                                        <Typography
-                                            variant="caption"
-                                            sx={{
-                                                color: "#53627A",
-                                                fontWeight: 700,
-                                            }}
-                                        >
-                                            {formatearHora(partido.fecha)}
-                                        </Typography>
-
-                                        {partido.fase && (
-                                            <Typography
-                                                variant="caption"
-                                                sx={{
-                                                    color: "#53627A",
-                                                    textAlign: "right",
-                                                }}
-                                            >
-                                                {partido.fase}
-                                            </Typography>
-                                        )}
-                                    </Stack>
-
-                                    <Box
-                                        sx={{
-                                            display: "grid",
-                                            gridTemplateColumns: {
-                                                xs: "minmax(0, 1fr) 140px minmax(0, 1fr)",
-                                                sm: "minmax(0, 1fr) 170px minmax(0, 1fr)",
-                                            },
+                                    <Typography 
+                                        sx={{ 
+                                            color: "#07152F", 
+                                            fontWeight: 700, 
+                                            textAlign: { xs: "center", sm: "right" },
+                                            // El display flex interno ayuda a eliminar desajustes de línea base en el texto
+                                            display: "flex",
                                             alignItems: "center",
-                                            gap: { xs: 1, sm: 2 },
+                                            m: 0 // Eliminamos posibles márgenes heredados
                                         }}
                                     >
-                                        <Stack
-                                            spacing={1}
-                                            alignItems="center"
-                                            sx={{ minWidth: 0 }}
-                                        >
-                                            <Box
-                                                sx={{
-                                                    height: 42,
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    justifyContent: "center",
-                                                }}
-                                            >
-                                                <EscudoEquipo
-                                                    equipo={partido.equipo_local}
-                                                />
-                                            </Box>
-
-                                            <Typography
-                                                sx={{
-                                                    fontWeight: 700,
-                                                    color: "#07152F",
-                                                    textAlign: "center",
-                                                    fontSize: {
-                                                        xs: "0.8rem",
-                                                        sm: "0.95rem",
-                                                    },
-                                                    overflowWrap: "anywhere",
-                                                }}
-                                            >
-                                                {partido.equipo_local.nombre}
-                                            </Typography>
-                                        </Stack>
-
-                                        <Stack
-                                            direction="row"
-                                            spacing={0.75}
-                                            alignItems="center"
-                                            justifyContent="center"
-                                        >
-                                            <TextField
-                                                value={valor.goles_local}
-                                                onChange={(e) =>
-                                                    handleChange(
-                                                        partido.id,
-                                                        "goles_local",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                type="number"
-                                                size="small"
-                                                inputProps={{
-                                                    min: 0,
-                                                    step: 1,
-                                                    inputMode: "numeric",
-                                                }}
-                                                aria-label={`Goles de ${partido.equipo_local.nombre}`}
-                                                sx={{
-                                                    width: { xs: 48, sm: 60 },
-                                                    "& input": {
-                                                        textAlign: "center",
-                                                        fontWeight: 800,
-                                                        fontSize: "1.1rem",
-                                                        p: 1,
-                                                    },
-                                                }}
-        
-                                                error={Boolean(errorPartido)}
-                                            />
-
-                                            <Typography
-                                                sx={{
-                                                    color: "#53627A",
-                                                    fontWeight: 700,
-                                                }}
-                                            >
-                                                -
-                                            </Typography>
-
-                                            <TextField
-                                                value={valor.goles_visitante}
-                                                onChange={(e) =>
-                                                    handleChange(
-                                                        partido.id,
-                                                        "goles_visitante",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                type="number"
-                                                size="small"
-                                                inputProps={{
-                                                    min: 0,
-                                                    step: 1,
-                                                    inputMode: "numeric",
-                                                }}
-                                                aria-label={`Goles de ${partido.equipo_visitante.nombre}`}
-                                                sx={{
-                                                    width: { xs: 48, sm: 60 },
-                                                    "& input": {
-                                                        textAlign: "center",
-                                                        fontWeight: 800,
-                                                        fontSize: "1.1rem",
-                                                        p: 1,
-                                                    },
-                                                }}
-                                                error={Boolean(errorPartido)}
-                                            />
-                                        </Stack>
-
-                                        <Stack
-                                            spacing={1}
-                                            alignItems="center"
-                                            sx={{ minWidth: 0 }}
-                                        >
-                                            <Box
-                                                sx={{
-                                                    height: 42,
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    justifyContent: "center",
-                                                }}
-                                            >
-                                                <EscudoEquipo
-                                                    equipo={partido.equipo_visitante}
-                                                />
-                                            </Box>
-
-                                            <Typography
-                                                sx={{
-                                                    fontWeight: 700,
-                                                    color: "#07152F",
-                                                    textAlign: "center",
-                                                    fontSize: {
-                                                        xs: "0.8rem",
-                                                        sm: "0.95rem",
-                                                    },
-                                                    overflowWrap: "anywhere",
-                                                }}
-                                            >
-                                                {partido.equipo_visitante.nombre}
-                                            </Typography>
-                                        </Stack>
+                                        {partido.equipo_local.nombre}
+                                    </Typography>
+                                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                                        <EscudoEquipo equipo={partido.equipo_local} size={40} />
                                     </Box>
+                                </Stack>
 
-                                    {errorPartido && (
-                                        <Typography
-                                            variant="caption"
-                                            color="error"
-                                            sx={{
-                                                display: "block",
-                                                mt: 1.5,
-                                            }}
-                                        >
-                                            {errorPartido}
-                                        </Typography>
-                                    )}
-                                </Paper>
-                            );
-                        })}
-                    </Stack>
+                                {/* 2. Marcador / Inputs de Goles */}
+                                <Stack 
+                                    direction="row" 
+                                    alignItems="center" 
+                                    justifyContent="center" 
+                                    spacing={1}
+                                    sx={{ minWidth: "120px", height: "100%" }}
+                                >
+                                    {campoGoles(partido.id, "goles_local", "Local")}
+                                    <Typography sx={{ color: "#123C82", fontWeight: 900, px: 0.5, display: "flex", alignItems: "center" }}>
+                                        –
+                                    </Typography>
+                                    {campoGoles(partido.id, "goles_visitante", "Visitant")}
+                                </Stack>
+                                
+                                {/* 3. Equipo Visitante */}
+                                <Stack 
+                                    direction="row" 
+                                    // Asegura que el escudo y el texto compartan el mismo eje central vertical
+                                    alignItems="center" 
+                                    spacing={1.5}
+                                    sx={{ 
+                                        width: "100%",
+                                        height: "100%", // Se estira verticalmente para calcular el centro real
+                                        justifyContent: { xs: "center", sm: "flex-start" } 
+                                    }}
+                                >
+                                    <Box sx={{ display: "flex", alignItems: "center", shrink: 0 }}>
+                                        <EscudoEquipo equipo={partido.equipo_visitante} size={40} />
+                                    </Box>
+                                    <Typography 
+                                        sx={{ 
+                                            color: "#07152F", 
+                                            fontWeight: 700, 
+                                            textAlign: { xs: "center", sm: "left" },
+                                            display: "flex",
+                                            alignItems: "center",
+                                            m: 0 // Eliminamos posibles márgenes heredados
+                                        }}
+                                    >
+                                        {partido.equipo_visitante.nombre}
+                                    </Typography>
+                                </Stack> 
+                            </Box>
+                        </Paper>
+                    ))
                 )}
-
-                {partidos.length > 0 && (
-                    <Stack
-                        direction={{ xs: "column-reverse", sm: "row" }}
-                        spacing={1.5}
-                        justifyContent="flex-end"
-                        sx={{ pt: 1 }}
-                    >
-                        <Button
-                            variant="outlined"
-                            startIcon={<CloseOutlinedIcon />}
-                            onClick={() => navigate("/partidos")}
-                            disabled={guardando}
-                            sx={{
-                                textTransform: "none",
-                                fontWeight: 700,
-                                borderColor: "#E1E7F0",
-                                color: "#53627A",
-                            }}
-                        >
-                            Cancelar
-                        </Button>
-
-                        <Button
-                            variant="contained"
-                            startIcon={<SaveOutlinedIcon />}
-                            onClick={handleGuardar}
-                            disabled={guardando}
-                            sx={{
-                                textTransform: "none",
-                                fontWeight: 700,
-                                backgroundColor: "#123C82",
-                                "&:hover": {
-                                    backgroundColor: "#07152F",
-                                },
-                            }}
-                        >
-                            {guardando
-                                ? "Guardando..."
-                                : "Guardar resultados"}
-                        </Button>
-                    </Stack>
-                )}
+            </Stack>
+            <Stack
+                direction="row"
+                justifyContent="flex-end"
+                sx={{ mt: 3, mb: 4 }}
+            >
+                <Button
+                    variant="contained"
+                    onClick={handleGuardar}
+                    disabled={guardando || partidos.length === 0}
+                    startIcon={
+                        guardando ? (
+                            <CircularProgress size={18} color="inherit" />
+                        ) : (
+                            <SaveOutlinedIcon />
+                        )
+                    }
+                    sx={{
+                        backgroundColor: "#123C82",
+                        borderRadius: "8px",
+                        textTransform: "none",
+                        fontWeight: 700,
+                        "&:hover": { backgroundColor: "#07152F" },
+                    }}
+                >
+                    {guardando ? "Guardant..." : "Guardar resultats"}
+                </Button>
             </Stack>
         </Box>
     );
 }
+
+export default EditarResultadosDiaPage;

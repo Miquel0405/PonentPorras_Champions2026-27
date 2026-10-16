@@ -1,32 +1,16 @@
-from .equipo import (
+from .models_crud import (
     EquipoListCreateView,
     EquipoDetailView,
-)
-
-from .pais import (
-    PaisListCreateView,
-    PaisDetailView,
-)
-
-from .partido_real import (
     PartidoRealListCreateView,
     PartidoRealDetailView,
-    PartidosInicioView,
     EditarPartidoCompletoView,
     EditarResultadosDiaView,
-)
-
-from .participante import (
     ParticipanteListCreateView,
     ParticipanteDetailView,
-    EditarPrediccionesDiaView,
+    EditarPronosticosDiaView,
+    PronosticoListCreateView,
+    PronosticoDetailView,
 )
 
-from .prediccion import (
-    PrediccionListCreateView,
-    PrediccionDetailView,
-)
-from .clasificacion import (
-    ClasificacionView,
-)
-from .health import health
+from .clasificacion import ClasificacionView
+from .partidos_inicio import PartidosInicioView

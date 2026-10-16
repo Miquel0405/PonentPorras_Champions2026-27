@@ -13,31 +13,27 @@ import {
 import HomeIcon from "@mui/icons-material/Home";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import GroupsIcon from "@mui/icons-material/Groups";
 
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
 
 const drawerWidth = 240;
 const bannerHeight = 68;
 
-function GlobalSidebar() {
-    const [open, setOpen] = useState(false);
-
+function GlobalSidebar({ open, onClose, onToggle, onOpen }) {
     const menuItems = [
         {
-            text: "Inicio",
+            text: "Inici",
             icon: <HomeIcon />,
             path: "/",
             end: true,
         },
         {
-            text: "Clasificación",
+            text: "Classificació",
             icon: <EmojiEventsIcon />,
             path: "/clasificacion",
         },
         {
-            text: "Partidos",
+            text: "Partits",
             icon: <SportsSoccerIcon />,
             path: "/partidos",
         },
@@ -47,18 +43,9 @@ function GlobalSidebar() {
         <>
             {/* Franja lateral que activa el menú */}
             <Box
-                onMouseEnter={() => setOpen(true)}
-                onFocus={() => setOpen(true)}
-                onClick={() => setOpen((previous) => !previous)}
-                role="button"
-                tabIndex={0}
-                aria-label="Abrir menú de navegación"
-                onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        setOpen((previous) => !previous);
-                    }
-                }}
+                onMouseEnter={onOpen}
+                onClick={onToggle}
+                aria-hidden="true"
                 sx={{
                     position: "fixed",
                     top: `${bannerHeight}px`,
@@ -74,7 +61,8 @@ function GlobalSidebar() {
                 variant="temporary"
                 anchor="left"
                 open={open}
-                onClose={() => setOpen(false)}
+                onClose={onClose}
+                PaperProps={{ id: "global-navigation-drawer" }}
                 ModalProps={{
                     hideBackdrop: true,
                     keepMounted: true,
@@ -92,7 +80,7 @@ function GlobalSidebar() {
                 }}
             >
                 <Box
-                    onMouseLeave={() => setOpen(false)}
+                    onMouseLeave={onClose}
                     sx={{ height: "100%", py: 2 }}
                 >
                     <Typography
@@ -106,7 +94,7 @@ function GlobalSidebar() {
                             textTransform: "uppercase",
                         }}
                     >
-                        Navegación
+                        Navegació
                     </Typography>
 
                     <List sx={{ px: 1.5 }}>
@@ -120,7 +108,7 @@ function GlobalSidebar() {
                                     component={NavLink}
                                     to={item.path}
                                     end={item.end}
-                                    onClick={() => setOpen(false)}
+                                    onClick={onClose}
                                     sx={{
                                         minHeight: 46,
                                         px: 2,

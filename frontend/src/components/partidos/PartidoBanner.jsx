@@ -14,14 +14,14 @@ function PartidoBanner({
 
     const fecha = new Date(partido.fecha);
 
-    const fechaFormateada = fecha.toLocaleDateString("es-ES", {
+    const fechaFormateada = fecha.toLocaleDateString("cat-ES", {
         weekday: "long",
         day: "numeric",
         month: "long",
         year: "numeric",
     });
 
-    const hora = fecha.toLocaleTimeString("es-ES", {
+    const hora = fecha.toLocaleTimeString("cat-ES", {
         hour: "2-digit",
         minute: "2-digit",
     });
@@ -203,7 +203,7 @@ function PartidoBanner({
                         fontSize: "0.8rem",
                     }}
                 >
-                    Introduce el resultado real del partido
+                    Introdueix el resultat real del partit
                 </Typography>
             )}
 
@@ -231,8 +231,8 @@ function PartidoBanner({
                 {editable
                     ? "EDICIÓN DEL RESULTADO"
                     : tieneResultado
-                        ? "PARTIDO FINALIZADO"
-                        : "PARTIDO PENDIENTE"}
+                        ? "PARTIT FINALITZAT"
+                        : "PARTIT PENDENT"}
             </Typography>
         </Paper>
     );

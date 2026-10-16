@@ -22,7 +22,7 @@ function PartidosInicio() {
             .then(setDatos)
             .catch((error) => {
                 console.error(error);
-                setError("No se han podido cargar los partidos.");
+                setError("No s'han pogut carregar els partits.");
             });
     }, []);
 
@@ -45,17 +45,17 @@ function PartidosInicio() {
     if (datos.tipo === "ninguno" || !datos.partidos?.length) {
         return (
             <Typography sx={{ color: "#53627A", py: 2 }}>
-                No hay próximos partidos.
+                No hi ha propers partits.
             </Typography>
         );
     }
 
     const titulo =
-        datos.tipo === "hoy" ? "Partidos de hoy" : "Próximos partidos";
+        datos.tipo === "hoy" ? "Partits de avui" : "Propers partits";
 
     const fecha = datos.fecha
         ? new Date(`${datos.fecha}T12:00:00`).toLocaleDateString(
-              "es-ES",
+              "cat-ES",
               {
                   weekday: "long",
                   day: "numeric",

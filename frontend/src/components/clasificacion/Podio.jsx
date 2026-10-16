@@ -19,19 +19,19 @@ const puestos = {
         numero: 1,
         color: "#E8BD65",
         fondo: "#FFF7E5",
-        etiqueta: "1.º puesto",
+        etiqueta: "1.º lloc",
     },
     segundo: {
         numero: 2,
         color: "#9AA7B8",
         fondo: "#F1F4F8",
-        etiqueta: "2.º puesto",
+        etiqueta: "2.º lloc",
     },
     tercero: {
         numero: 3,
         color: "#BC8056",
         fondo: "#FBF0E8",
-        etiqueta: "3.º puesto",
+        etiqueta: "3.º lloc",
     },
 };
 
@@ -48,7 +48,7 @@ function Podio() {
             })
             .catch((error) => {
                 console.error(error);
-                setError("No se ha podido cargar la clasificación.");
+                setError("No s'ha pogut carregar la classificació.");
             });
     }, []);
 
@@ -76,10 +76,10 @@ function Podio() {
         return (
             <Box>
                 <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>
-                    Podio
+                    Podi i classificació
                 </Typography>
                 <Typography color="text.secondary">
-                    Todavía no hay participantes en esta porra.
+                    Encara no hi ha participants en aquesta porra.
                 </Typography>
             </Box>
         );
@@ -120,7 +120,7 @@ function Podio() {
                         fontWeight: 800,
                     }}
                 >
-                    Podio
+                    Podi i classificació
                 </Typography>
             </Stack>
 
@@ -213,7 +213,7 @@ function Podio() {
                                     textAlign: "center",
                                 }}
                             >
-                                {participante.puntos} puntos
+                                {participante.puntos} punts
                             </Typography>
                         </Paper>
                     );
@@ -232,7 +232,7 @@ function Podio() {
                             fontWeight: 800,
                         }}
                     >
-                        Clasificación completa
+                        Classificació completa
                     </Typography>
 
                     <Stack spacing={1}>

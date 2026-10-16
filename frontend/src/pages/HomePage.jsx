@@ -1,5 +1,4 @@
 
-import { useParams } from "react-router-dom";
 import {
     Box,
     Grid,
@@ -19,22 +18,31 @@ function HomePage() {
                     component="h1"
                     sx={{
                         mb: 0.75,
-                        color: "#07152F",
+                        color: "#FFFFFF",
                         fontSize: { xs: "1.6rem", md: "2rem" },
                         fontWeight: 800,
                         lineHeight: 1.2,
                     }}
                 >
-                    Inicio
+                    Inici
                 </Typography>
 
                 <Typography
                     sx={{
-                        color: "#53627A",
+                        color: "#eaf1ffdb",
+                        fontSize: "0.95rem",
+                        bold: true,
+                    }}
+                >
+                    Benvingut a la única i inigualable web de Ponent Porras - Edició Champios League 2026-27.
+                </Typography>
+                <Typography
+                    sx={{
+                        color: "#eaf1ffdb",
                         fontSize: "0.95rem",
                     }}
                 >
-                    Consulta la clasificación y sigue los próximos partidos.
+                    Consulta la clasificació i els pròxims partits de la competició.
                 </Typography>
             </Box>
 

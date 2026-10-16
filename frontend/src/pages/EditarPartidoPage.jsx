@@ -1,26 +1,43 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-
 import {
     Alert,
     Box,
     Button,
     CircularProgress,
-    Stack,
+    Paper,
     Typography,
 } from "@mui/material";
-
+import BackIcon from "@mui/icons-material/ArrowBack";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import {
     getPartido,
     getParticipantes,
     guardarEdicionPartido,
 } from "../api/api";
-
 import PartidoBanner from "../components/partidos/PartidoBanner";
 import PartidoPorras from "../components/partidos/PartidoPorras";
+
+function extraerMensajeError(error) {
+    const datos = error.response?.data;
+    if (!datos) return "No s'han pogut guardar els canvis.";
+    if (typeof datos === "string") return datos;
+
+    const extraerMensajes = (valor) => {
+        if (typeof valor === "string") return [valor];
+        if (Array.isArray(valor)) return valor.flatMap(extraerMensajes);
+        if (valor && typeof valor === "object") {
+            return Object.values(valor).flatMap(extraerMensajes);
+        }
+        return [];
+    };
+
+    const mensajes = extraerMensajes(datos);
+    return mensajes.length
+        ? mensajes.join(" ")
+        : "No s'han pogut guardar els canvis.";
+}
 
 function EditarPartidoPage() {
     const { partidoId } = useParams();
@@ -32,65 +49,60 @@ function EditarPartidoPage() {
         goles_local: null,
         goles_visitante: null,
     });
-    const [valoresPredicciones, setValoresPredicciones] = useState({});
+    const [valoresPronosticos, setValoresPronosticos] = useState({});
     const [cargando, setCargando] = useState(true);
     const [guardando, setGuardando] = useState(false);
-    const [error, setError] = useState("");
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         let activo = true;
 
-        const cargarDatos = async () => {
-            setCargando(true);
-            setError("");
-
-            try {
-                const [datosPartido, datosParticipantes] = await Promise.all([
-                    getPartido(partidoId),
-                    getParticipantes(),
-                ]);
-
+        Promise.all([getPartido(partidoId), getParticipantes()])
+            .then(([datosPartido, datosParticipantes]) => {
                 if (!activo) return;
 
                 setPartido(datosPartido);
                 setParticipantes(datosParticipantes);
-
                 setResultado({
                     goles_local: datosPartido.goles_local,
                     goles_visitante: datosPartido.goles_visitante,
                 });
 
-                const prediccionesExistentes = new Map(
-                    (datosPartido.predicciones ?? []).map((prediccion) => [
-                        prediccion.participante.id,
-                        prediccion,
+                const pronosticosExistentes = new Map(
+                    (datosPartido.pronosticos ?? []).map((pronostico) => [
+                        pronostico.participante.id,
+                        pronostico,
                     ])
                 );
 
-                const valoresIniciales = {};
+                setValoresPronosticos(
+                    Object.fromEntries(
+                        datosParticipantes.map((participante) => {
+                            const pronostico = pronosticosExistentes.get(
+                                participante.id
+                            );
 
-                datosParticipantes.forEach((participante) => {
-                    const prediccion = prediccionesExistentes.get(participante.id);
-
-                    valoresIniciales[participante.id] = {
-                        goles_local: prediccion?.goles_local ?? null,
-                        goles_visitante: prediccion?.goles_visitante ?? null,
-                    };
-                });
-
-                setValoresPredicciones(valoresIniciales);
-            } catch (err) {
-                console.error(err);
-
+                            return [
+                                participante.id,
+                                {
+                                    goles_local: pronostico?.goles_local ?? null,
+                                    goles_visitante:
+                                        pronostico?.goles_visitante ?? null,
+                                },
+                            ];
+                        })
+                    )
+                );
+            })
+            .catch((error) => {
+                console.error(error);
                 if (activo) {
-                    setError("No se han podido cargar los datos del partido.");
+                    setError("No s'han pogut carregar les dades del partit.");
                 }
-            } finally {
+            })
+            .finally(() => {
                 if (activo) setCargando(false);
-            }
-        };
-
-        cargarDatos();
+            });
 
         return () => {
             activo = false;
@@ -104,8 +116,8 @@ function EditarPartidoPage() {
         }));
     };
 
-    const handlePrediccionChange = (participanteId, campo, valor) => {
-        setValoresPredicciones((actual) => ({
+    const handlePronosticoChange = (participanteId, campo, valor) => {
+        setValoresPronosticos((actual) => ({
             ...actual,
             [participanteId]: {
                 ...actual[participanteId],
@@ -115,38 +127,25 @@ function EditarPartidoPage() {
     };
 
     const handleGuardar = async () => {
-        setError("");
+        setError(null);
         setGuardando(true);
 
         try {
-            const datos = {
+            await guardarEdicionPartido(partidoId, {
                 goles_local: resultado.goles_local,
                 goles_visitante: resultado.goles_visitante,
-                predicciones: participantes.map((participante) => ({
+                pronosticos: participantes.map((participante) => ({
                     participante_id: participante.id,
                     goles_local:
-                        valoresPredicciones[participante.id]?.goles_local ?? null,
+                        valoresPronosticos[participante.id]?.goles_local ?? null,
                     goles_visitante:
-                        valoresPredicciones[participante.id]?.goles_visitante ?? null,
+                        valoresPronosticos[participante.id]?.goles_visitante ?? null,
                 })),
-            };
-
-            await guardarEdicionPartido(partidoId, datos);
-
+            });
             navigate(`/partidos/${partidoId}`);
-        } catch (err) {
-            console.error(err);
-
-            const detalle =
-                err.response?.data?.detail ??
-                err.response?.data?.predicciones ??
-                "No se han podido guardar los cambios.";
-
-            setError(
-                typeof detalle === "string"
-                    ? detalle
-                    : "Revisa los datos introducidos e inténtalo de nuevo."
-            );
+        } catch (error) {
+            console.error(error);
+            setError(extraerMensajeError(error));
         } finally {
             setGuardando(false);
         }
@@ -154,42 +153,121 @@ function EditarPartidoPage() {
 
     if (cargando) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+            <Box
+                sx={{
+                    minHeight: 240,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 2,
+                }}
+            >
                 <CircularProgress sx={{ color: "#3478F6" }} />
+                <Typography sx={{ color: "#53627A", fontSize: "0.9rem" }}>
+                    Carregant partit...
+                </Typography>
             </Box>
         );
     }
 
-    if (!partido) {
+    if (error || !partido) {
         return (
-            <Box>
-                <Alert severity="error">
-                    {error || "No se ha podido cargar el partido."}
-                </Alert>
-
-                <Button
-                    onClick={() => navigate(`/partidos/${partidoId}`)}
-                    sx={{ mt: 2, textTransform: "none" }}
-                >
-                    Volver al partido
-                </Button>
-            </Box>
+            <Paper
+                role="alert"
+                elevation={0}
+                sx={{
+                    p: 3,
+                    color: "#B42318",
+                    bgcolor: "#FFF5F5",
+                    border: "1px solid #F3C7C7",
+                    borderRadius: "12px",
+                }}
+            >
+                <Typography sx={{ fontWeight: 700 }}>
+                    No s'ha pogut carregar el partit
+                </Typography>
+                <Typography sx={{ mt: 0.5 }}>
+                    {error ?? "El partit no existeix."}
+                </Typography>
+            </Paper>
         );
     }
 
     return (
         <Box>
-            <Typography
-                component="h1"
+            <Box
                 sx={{
-                    color: "#07152F",
-                    fontSize: { xs: "1.6rem", sm: "2rem" },
-                    fontWeight: 800,
-                    mb: 2.5,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 2,
+                    mb: 2,
+                    flexWrap: "wrap",
                 }}
             >
-                Editar partido
-            </Typography>
+                <Typography
+                    component="h1"
+                    sx={{
+                        color: "#07152F",
+                        fontSize: { xs: "1.25rem", sm: "1.5rem" },
+                        fontWeight: 800,
+                    }}
+                >
+                    Editar partit
+                </Typography>
+
+                <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                    <Button
+                        component={Link}
+                        to={`/partidos/${partidoId}`}
+                        variant="outlined"
+                        startIcon={<BackIcon />}
+                        disabled={guardando}
+                        sx={{
+                            color: "#F3F6FC",
+                            borderColor: "#123C82",
+                            borderRadius: "8px",
+                            textTransform: "none",
+                            fontWeight: 700,
+                            "&:hover": {
+                                backgroundColor: "#3478F6",
+                            },
+                        }}
+                    >
+                        Tornar al partit
+                    </Button>
+                    <Button
+                        variant="contained"
+                        startIcon={
+                            guardando ? (
+                                <CircularProgress size={18} color="inherit" />
+                            ) : (
+                                <SaveOutlinedIcon />
+                            )
+                        }
+                        onClick={handleGuardar}
+                        disabled={guardando}
+                        sx={{
+                            backgroundColor: "#123C82",
+                            borderRadius: "8px",
+                            textTransform: "none",
+                            fontWeight: 700,
+                            "&:hover": {
+                                backgroundColor: "#07152F",
+                            },
+                        }}
+                    >
+                        {guardando ? "Guardant..." : "Guardar canvis"}
+                    </Button>
+                </Box>
+            </Box>
+
+            {error && (
+                <Alert severity="error" role="alert" sx={{ mb: 2 }}>
+                    {error}
+                </Alert>
+            )}
 
             <PartidoBanner
                 partido={partido}
@@ -202,56 +280,9 @@ function EditarPartidoPage() {
             <PartidoPorras
                 editable
                 participantes={participantes}
-                valoresPredicciones={valoresPredicciones}
-                onPrediccionChange={handlePrediccionChange}
+                valoresPronosticos={valoresPronosticos}
+                onPronosticoChange={handlePronosticoChange}
             />
-
-            {error && (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                    {error}
-                </Alert>
-            )}
-
-            <Stack
-                direction={{ xs: "column-reverse", sm: "row" }}
-                justifyContent="flex-end"
-                spacing={1.5}
-                sx={{ mt: 3, mb: 4 }}
-            >
-                <Button
-                    variant="outlined"
-                    startIcon={<CloseOutlinedIcon />}
-                    disabled={guardando}
-                    onClick={() => navigate(`/partidos/${partidoId}`)}
-                    sx={{
-                        color: "#123C82",
-                        borderColor: "#E1E7F0",
-                        textTransform: "none",
-                        fontWeight: 700,
-                    }}
-                >
-                    Cancelar
-                </Button>
-
-                <Button
-                    variant="contained"
-                    startIcon={
-                        guardando
-                            ? <CircularProgress size={18} color="inherit" />
-                            : <SaveOutlinedIcon />
-                    }
-                    disabled={guardando || participantes.length === 0}
-                    onClick={handleGuardar}
-                    sx={{
-                        backgroundColor: "#123C82",
-                        "&:hover": { backgroundColor: "#07152F" },
-                        textTransform: "none",
-                        fontWeight: 700,
-                    }}
-                >
-                    {guardando ? "Guardando..." : "Guardar cambios"}
-                </Button>
-            </Stack>
         </Box>
     );
 }

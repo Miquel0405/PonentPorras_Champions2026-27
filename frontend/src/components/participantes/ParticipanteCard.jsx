@@ -117,30 +117,50 @@ function ParticipanteCard({ participante, posicion }) {
                                     fontSize: "0.78rem",
                                 }}
                             >
-                                {participante.predicciones ?? 0} predicciones
+                                {participante.nb_pronosticos ?? 0} porres
                             </Typography>
                         </Box>
 
-                        <Box sx={{ flexShrink: 0, textAlign: "right" }}>
+                        <Stack direction="row" alignItems="baseline" spacing={0.5}>
                             <Typography
                                 sx={{
                                     color: "#123C82",
                                     fontWeight: 800,
                                     fontSize: { xs: "1rem", sm: "1.15rem" },
+                                    lineHeight: 1.2,
                                 }}
                             >
-                                {participante.puntos ?? 0}
+                                {participante.puntos ?? 0} pts
                             </Typography>
+                        </Stack>
 
+                        <Stack
+                            alignItems="flex-end"
+                            spacing={0.25}
+                            aria-label="Desglose de aciertos"
+                        >
                             <Typography
-                                sx={{
-                                    color: "#53627A",
-                                    fontSize: "0.75rem",
-                                }}
+                                component="span"
+                                aria-label={`${participante.nb_plenos ?? 0} plenos`}
+                                sx={{ color: "#16803C", fontSize: "0.7rem", fontWeight: 700 }}
                             >
-                                puntos
+                                {participante.nb_plenos ?? 0} PLENOS
                             </Typography>
-                        </Box>
+                            <Typography
+                                component="span"
+                                aria-label={`${participante.nb_ddg ?? 0} diferencias de goles`}
+                                sx={{ color: "#e4c55f", fontSize: "0.7rem", fontWeight: 700 }}
+                            >
+                                {participante.nb_ddg ?? 0} DDG
+                            </Typography>
+                            <Typography
+                                component="span"
+                                aria-label={`${participante.nb_1x2 ?? 0} aciertos 1X2`}
+                                sx={{ color: "#C45B13", fontSize: "0.7rem", fontWeight: 700 }}
+                            >
+                                {participante.nb_1x2 ?? 0} 1X2
+                            </Typography>
+                        </Stack>
                     </Stack>
                 </CardContent>
             </CardActionArea>

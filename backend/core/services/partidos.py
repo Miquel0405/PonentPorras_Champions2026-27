@@ -1,17 +1,40 @@
-from ..models import PartidoReal
+
+from datetime import datetime, time, timedelta
+
 from django.utils import timezone
 
-def obtener_partidos_por_fecha(fecha):
-    return (
-        PartidoReal.objects
-        .filter(fecha__date=fecha)
+from ..models import PartidoReal
+
+
+def queryset_partidos():
+    return PartidoReal.objects.select_related(
+        "equipo_local",
+        "equipo_visitante",
     )
+
+def inicio_dia(fecha):
+    return timezone.make_aware(
+        datetime.combine(fecha, time.min),
+        timezone.get_current_timezone(),
+    )
+
+
+def obtener_partidos_por_fecha(fecha):
+    inicio = inicio_dia(fecha)
+    fin = inicio_dia(fecha + timedelta(days=1))
+
+    return (
+        queryset_partidos().filter(fecha__gte=inicio, fecha__lt=fin).order_by("fecha", "id")
+    )
+
 
 def obtener_partidos_inicio():
     hoy = timezone.localdate()
-    partidos_hoy = obtener_partidos_por_fecha(hoy)
+    manana = hoy + timedelta(days=1)
 
-    if partidos_hoy.exists():
+    partidos_hoy = list(obtener_partidos_por_fecha(hoy))
+
+    if partidos_hoy:
         return {
             "tipo": "hoy",
             "fecha": hoy,
@@ -20,7 +43,8 @@ def obtener_partidos_inicio():
 
     siguiente_partido = (
         PartidoReal.objects
-        .filter(fecha__date__gt=hoy)
+        .filter(fecha__gte=inicio_dia(manana))
+        .order_by("fecha")
         .first()
     )
 
@@ -31,14 +55,12 @@ def obtener_partidos_inicio():
             "partidos": PartidoReal.objects.none(),
         }
 
-    siguiente_fecha = siguiente_partido.fecha.date()
-
-    partidos_siguiente_dia = PartidoReal.objects.filter(
-        fecha__date=siguiente_fecha
-    )
+    siguiente_fecha = timezone.localtime(
+        siguiente_partido.fecha
+    ).date()
 
     return {
         "tipo": "proximo",
         "fecha": siguiente_fecha,
-        "partidos": partidos_siguiente_dia,
+        "partidos": obtener_partidos_por_fecha(siguiente_fecha),
     }

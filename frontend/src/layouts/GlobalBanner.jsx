@@ -1,7 +1,9 @@
 
-import { AppBar, Box, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import MenuIcon from "@mui/icons-material/Menu";
 
-function GlobalBanner() {
+function GlobalBanner({ menuOpen, onMenuToggle }) {
     return (
         <AppBar
             position="fixed"
@@ -18,6 +20,20 @@ function GlobalBanner() {
                     px: { xs: 2, md: 4 },
                 }}
             >
+                <IconButton
+                    onClick={onMenuToggle}
+                    aria-label={menuOpen ? "Cerrar menú de navegación" : "Abrir menú de navegación"}
+                    aria-expanded={menuOpen}
+                    aria-controls="global-navigation-drawer"
+                    color="inherit"
+                    sx={{
+                        mr: 1.5,
+                        color: "#FFFFFF",
+                    }}
+                >
+                    {menuOpen ? <CloseIcon /> : <MenuIcon />}
+                </IconButton>
+
                 <Box
                     sx={{
                         width: 4,

@@ -1,52 +1,36 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
+    baseURL: `${import.meta.env.VITE_API_URL}/api`,
 });
 
-
 export const getClasificacion = async () => {
-    const response = await api.get(
-        `/clasificacion/`
-    );
-
+    const response = await api.get("/clasificacion/");
     return response.data;
 };
+
 export const getPartidosInicio = async () => {
-    const response = await api.get(
-        `/partidos-inicio/`
-    );
-
+    const response = await api.get("/partidos-inicio/");
     return response.data;
 };
 
-export const getPartidos = async () => {
-    const response = await api.get(
-        `/partidos/`
-    );
-
+export const getPartidos = async (params) => {
+    const response = await api.get("/partidos/", { params });
     return response.data;
 };
 
 export const getParticipantes = async () => {
-    const response = await api.get(
-        `/participantes/`
-    );
+    const response = await api.get("/participantes/");
     return response.data;
 };
 
 export const getParticipante = async (participanteId) => {
-    const response = await api.get(
-        `/participantes/${participanteId}/`
-    );
-
+    const response = await api.get(`/participantes/${participanteId}/`);
     return response.data;
 };
 
 export const getPartido = async (partidoId) => {
-    const response = await api.get(
-        `/partidos/${partidoId}/`
-    );
+    const response = await api.get(`/partidos/${partidoId}/`);
     return response.data;
 };
 
@@ -55,25 +39,23 @@ export const guardarEdicionPartido = async (partidoId, datos) => {
         `/partidos/${partidoId}/editar-completo/`,
         datos
     );
-
     return response.data;
 };
 
-export const getPredicciones = async () => {
-    const response = await api.get("/predicciones/");
+export const getPronosticos = async (params) => {
+    const response = await api.get("/pronosticos/", { params });
     return response.data;
 };
 
-export const guardarPrediccionesDia = async (
+export const guardarPronosticosDia = async (
     participanteId,
     fecha,
-    predicciones
+    pronosticos
 ) => {
     const response = await api.post(
-        `/participantes/${participanteId}/predicciones-dia/${fecha}/`,
-        { predicciones }
+        `/participantes/${participanteId}/pronosticos-dia/${fecha}/`,
+        { pronosticos }
     );
-
     return response.data;
 };
 

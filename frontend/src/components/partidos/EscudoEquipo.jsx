@@ -1,8 +1,31 @@
 
+import { useEffect, useState } from "react";
 import { Box } from "@mui/material";
 
 function EscudoEquipo({ equipo, size = 36 }) {
     const escudo = equipo?.escudo;
+
+    // Extrae el nombre del archivo, independientemente de si Django
+    // devuelve "escudos/equipo.svg" o "/media/escudos/equipo.svg".
+    const nombreArchivo = escudo
+        ? String(escudo)
+              .split(/[?#]/)[0]
+              .split("/")
+              .filter(Boolean)
+              .pop()
+        : null;
+
+    const escudoSrc = nombreArchivo
+        ? `/escudos/${nombreArchivo}`
+        : null;
+
+    const [errorImagen, setErrorImagen] = useState(false);
+
+    useEffect(() => {
+        setErrorImagen(false);
+    }, [escudoSrc]);
+
+    const mostrarEscudo = escudoSrc && !errorImagen;
 
     return (
         <Box
@@ -16,10 +39,10 @@ function EscudoEquipo({ equipo, size = 36 }) {
                 overflow: "hidden",
             }}
         >
-            {escudo ? (
+            {mostrarEscudo ? (
                 <Box
                     component="img"
-                    src={escudo}
+                    src={escudoSrc}
                     alt={`Escudo de ${equipo.nombre}`}
                     loading="lazy"
                     sx={{
@@ -27,9 +50,7 @@ function EscudoEquipo({ equipo, size = 36 }) {
                         height: "100%",
                         objectFit: "contain",
                     }}
-                    onError={(event) => {
-                        event.currentTarget.style.display = "none";
-                    }}
+                    onError={() => setErrorImagen(true)}
                 />
             ) : (
                 <Box

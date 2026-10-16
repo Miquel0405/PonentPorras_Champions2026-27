@@ -16,12 +16,12 @@ function PartidoCard({ partido }) {
 
     const fechaPartido = new Date(partido.fecha);
 
-    const fecha = fechaPartido.toLocaleDateString("es-ES", {
+    const fecha = fechaPartido.toLocaleDateString("cat-ES", {
         day: "numeric",
         month: "short",
     });
 
-    const hora = fechaPartido.toLocaleTimeString("es-ES", {
+    const hora = fechaPartido.toLocaleTimeString("cat-ES", {
         hour: "2-digit",
         minute: "2-digit",
     });
@@ -157,7 +157,7 @@ function PartidoCard({ partido }) {
                                     mt: 0.25,
                                 }}
                             >
-                                {tieneResultado ? "Finalizado" : "Pendiente"}
+                                {tieneResultado ? "Finalitzat" : "Pendent"}
                             </Typography>
                         </Box>
                     </Stack>

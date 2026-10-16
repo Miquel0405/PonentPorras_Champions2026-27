@@ -1,16 +1,21 @@
 import { Box, Paper, Stack, Typography } from "@mui/material";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import PrediccionPartidoCard from "../predicciones/PrediccionPartidoCard";
+import PronosticoPartidoCard from "../pronosticos/PronosticoPartidoCard";
 
 function PartidoPorras({
-    predicciones = [],
+    pronosticos = [],
     editable = false,
     participantes = [],
-    valoresPredicciones = {},
-    onPrediccionChange,
+    valoresPronosticos = {},
+    onPronosticoChange,
 }) {
-    const total = editable ? participantes.length : predicciones.length;
+    const total = editable ? participantes.length : pronosticos.length;
 
+    const pronosticosOrdenados = [...pronosticos].sort((a, b) => {
+        const puntosA = Number(a.puntos ?? 0);
+        const puntosB = Number(b.puntos ?? 0);
+        return puntosB - puntosA;
+    });
     return (
         <Paper
             elevation={0}
@@ -38,7 +43,7 @@ function PartidoPorras({
                         fontWeight: 800,
                     }}
                 >
-                    {editable ? "Editar pronósticos" : "Pronósticos de los participantes"}
+                    {editable ? "Editar pronostics" : "Porres dels participants"}
                 </Typography>
 
                 <Box
@@ -68,28 +73,28 @@ function PartidoPorras({
                 >
                     <Typography sx={{ color: "#53627A", fontWeight: 600 }}>
                         {editable
-                            ? "No hay participantes registrados."
-                            : "Todavía no hay pronósticos para este partido."}
+                            ? "No hi ha participants registrats."
+                            : "Encara no hi ha cap porra per aquest partit."}
                     </Typography>
                 </Box>
             ) : (
                 <Stack spacing={1.25}>
                     {editable
                         ? participantes.map((participante) => {
-                            const valores = valoresPredicciones[participante.id] ?? {
+                            const valores = valoresPronosticos[participante.id] ?? {
                                 goles_local: null,
                                 goles_visitante: null,
                             };
 
                             return (
-                                <PrediccionPartidoCard
+                                <PronosticoPartidoCard
                                     key={participante.id}
                                     editable
                                     participante={participante}
                                     golesLocal={valores.goles_local}
                                     golesVisitante={valores.goles_visitante}
                                     onChange={(campo, valor) =>
-                                        onPrediccionChange(
+                                        onPronosticoChange(
                                             participante.id,
                                             campo,
                                             valor
@@ -98,10 +103,10 @@ function PartidoPorras({
                                 />
                             );
                         })
-                        : predicciones.map((prediccion) => (
-                            <PrediccionPartidoCard
-                                key={prediccion.id}
-                                prediccion={prediccion}
+                        : pronosticosOrdenados.map((pronostico) => (
+                            <PronosticoPartidoCard
+                                key={pronostico.id}
+                                pronostico={pronostico}
                             />
                         ))}
                 </Stack>

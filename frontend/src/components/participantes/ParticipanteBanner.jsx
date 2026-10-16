@@ -66,7 +66,7 @@ function ParticipanteBanner({ participante }) {
                                 textTransform: "uppercase",
                             }}
                         >
-                            Perfil del participante
+                            Perfil del participant
                         </Typography>
 
                         <Typography
@@ -102,7 +102,7 @@ function ParticipanteBanner({ participante }) {
                                 fontWeight: 600,
                             }}
                         >
-                            Puntos totales
+                            Punts totals
                         </Typography>
                     </Stack>
 

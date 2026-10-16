@@ -6,6 +6,7 @@ import {
 } from "@mui/material";
 
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import BackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -27,7 +28,7 @@ function PartidoPage() {
             .then(setPartido)
             .catch((error) => {
                 console.error(error);
-                setError("No se ha podido cargar el partido.");
+                setError("No s'ha pogut carregar el partit.");
             });
     }, [partidoId]);
 
@@ -61,9 +62,28 @@ function PartidoPage() {
                 sx={{
                     display: "flex",
                     justifyContent: "flex-end",
+                    gap: 1,
                     mb: 2,
                 }}
             >
+                <Button
+                    component={Link}
+                    to="/partidos"
+                    variant="outlined"
+                    startIcon={<BackIcon />}
+                    sx={{
+                        color: "#F3F6FC",
+                        borderColor: "#123C82",
+                        borderRadius: "8px",
+                        textTransform: "none",
+                        fontWeight: 700,
+                        "&:hover": {
+                            backgroundColor: "#3478F6",
+                        },
+                    }}
+                >
+                    Tornar als partits
+                </Button>
                 <Button
                     component={Link}
                     to={`/partidos/${partidoId}/editar`}
@@ -79,14 +99,14 @@ function PartidoPage() {
                         },
                     }}
                 >
-                    Editar Partido
-                </Button>
+                    Editar Partit
+                </Button>  
             </Box>
 
             <PartidoBanner partido={partido} />
 
             <PartidoPorras
-                predicciones={partido.predicciones ?? []}
+                pronosticos={partido.pronosticos ?? []}
             />
         </Box>
     );

@@ -30,7 +30,7 @@ function formatearDia(clave) {
     const [year, month, day] = clave.split("-").map(Number);
 
     return new Date(year, month - 1, day).toLocaleDateString(
-        "es-ES",
+        "cat-ES",
         {
             weekday: "long",
             day: "numeric",
@@ -129,7 +129,7 @@ function Partidos({ partidos }) {
                     sx={{ fontSize: 38, color: "#9AA9BF", mb: 1 }}
                 />
                 <Typography sx={{ color: "#53627A" }}>
-                    No hay partidos disponibles.
+                    No hi ha cap partit disponible.
                 </Typography>
             </Box>
         );
@@ -190,7 +190,7 @@ function Partidos({ partidos }) {
                                 (total, dia) => total + dia.partidos.length,
                                 0
                             )}{" "}
-                            partidos
+                            partits
                         </Typography>
                     </AccordionSummary>
 
@@ -261,27 +261,6 @@ function Partidos({ partidos }) {
 
                                             <AccordionDetails sx={{ p: 1.25 }}>
                                                 <Stack spacing={1.25}>
-                                                    {/* <Button
-                                                        variant="outlined"
-                                                        onClick={() =>
-                                                            navigate(
-                                                                `/partidos/dia/${dia.fecha}/participantes`
-                                                            )
-                                                        }
-                                                        sx={{
-                                                            alignSelf: "flex-start",
-                                                            textTransform: "none",
-                                                            fontWeight: 700,
-                                                            borderColor: "#3478F6",
-                                                            color: "#123C82",
-                                                            "&:hover": {
-                                                                borderColor: "#123C82",
-                                                                backgroundColor: "#EAF1FF",
-                                                            },
-                                                        }}
-                                                    >
-                                                        Editar predicciones
-                                                    </Button> */}
                                                     <Stack
                                                         direction={{ xs: "column", sm: "row" }}
                                                         spacing={1}
@@ -299,7 +278,7 @@ function Partidos({ partidos }) {
                                                             color: "#123C82",
                                                             }}
                                                         >
-                                                            Editar predicciones
+                                                            Editar porres
                                                         </Button>
 
                                                         <Button
@@ -314,7 +293,7 @@ function Partidos({ partidos }) {
                                                             "&:hover": { backgroundColor: "#07152F" },
                                                             }}
                                                         >
-                                                            Editar resultados reales
+                                                            Editar resultats reals
                                                         </Button>
                                                     </Stack>
 

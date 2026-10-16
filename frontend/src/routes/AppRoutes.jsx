@@ -7,8 +7,8 @@ import PartidosPage from "../pages/PartidosPage";
 import ParticipantePage from "../pages/ParticipantePage";
 import PartidoPage from "../pages/PartidoPage";
 import EditarPartidoPage from "../pages/EditarPartidoPage";
-import EditarPrediccionesDiaPage from "../pages/EditarPrediccionesDiaPage";
-import EditarPrediccionesParticipanteDiaPage from "../pages/EditarPrediccionesParticipanteDiaPage";
+import EditarPronosticosDiaPage from "../pages/EditarPronosticosDiaPage";
+import EditarPronosticosParticipanteDiaPage from "../pages/EditarPronosticosParticipanteDiaPage";
 import EditarResultadosDiaPage from "../pages/EditarResultadosDiaPage";
 
 function AppRoutes() {
@@ -52,17 +52,19 @@ function AppRoutes() {
                     path="/partidos/:partidoId/editar"
                     element={<EditarPartidoPage />}
                 />
-                {/* Selección de participantes para editar las predicciones de un día */}
+                {/* Selección de participante para editar las porras de un día */}
                 <Route
                     path="/partidos/dia/:fecha/participantes"
-                    element={<EditarPrediccionesDiaPage />}
+                    element={<EditarPronosticosDiaPage />}
                 />
 
-                {/* Edición de las predicciones de un participante para un día */}
+                {/* Edición de las porras de un participante para un día */}
                 <Route
                     path="/partidos/dia/:fecha/participantes/:participanteId/editar"
-                    element={<EditarPrediccionesParticipanteDiaPage />}
+                    element={<EditarPronosticosParticipanteDiaPage />}
                 />
+
+                {/* Edición de los resultados reales de un día */}
                 <Route
                     path="/partidos/dia/:fecha/resultados"
                     element={<EditarResultadosDiaPage />}

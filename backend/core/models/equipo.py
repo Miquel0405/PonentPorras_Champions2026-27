@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+
 from pathlib import Path
 
 def validar_escudo(archivo):
@@ -14,8 +15,7 @@ def validar_escudo(archivo):
 
 class Equipo(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    abreviatura = models.CharField(max_length=10, null=True, blank=True)
-    pais = models.ForeignKey('Pais', on_delete=models.SET_NULL, null=True, blank=True)
+    # abreviatura = models.CharField(max_length=10, null=True, blank=True)
     escudo = models.FileField(upload_to='escudos/', null=True, blank=True, validators=[validar_escudo])
     apodo_puskas = models.CharField(max_length=100, null=True, blank=True)
 

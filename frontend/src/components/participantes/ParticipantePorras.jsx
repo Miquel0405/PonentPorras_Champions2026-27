@@ -1,97 +1,87 @@
 
 import {
     Box,
-    Paper,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
     Stack,
-    Typography,
 } from "@mui/material";
+import { useState } from "react";
 
-import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import PrediccionParticipanteCard from "../predicciones/PrediccionParticipanteCard";
+import PronosticoParticipanteCard from "../pronosticos/PronosticoParticipanteCard";
 
-function ParticipantePorras({ predicciones = [] }) {
-    return (
-        <Paper
-            elevation={0}
-            sx={{
-                p: { xs: 2, sm: 3 },
-                bgcolor: "#FFFFFF",
-                border: "1px solid #E1E7F0",
-                borderRadius: "12px",
-                boxShadow: "0 2px 10px rgb(7 21 47 / 6%)",
-            }}
-        >
-            <Stack
-                direction="row"
-                alignItems="center"
-                spacing={1}
-                sx={{ mb: 2.5 }}
+function ParticipantePorras({ pronosticos = [] }) {
+    const [orden, setOrden] = useState("fecha-desc");
+
+    if (pronosticos.length === 0) {
+        return (
+            <Box
+                sx={{
+                    py: 4,
+                    px: 2,
+                    textAlign: "center",
+                    border: "1px dashed #D4DEEC",
+                    borderRadius: "10px",
+                    bgcolor: "#F8FAFE",
+                }}
             >
-                <SportsSoccerIcon sx={{ color: "#3478F6" }} />
+                Encara no hi ha porres. Aquest participant encara no s'ha atrevit a tirar cap porra.
+            </Box>
+        );
+    }
 
-                <Typography
-                    component="h2"
-                    sx={{
-                        color: "#07152F",
-                        fontSize: "1.2rem",
-                        fontWeight: 800,
-                    }}
-                >
-                    Predicciones
-                </Typography>
+    const pronosticosOrdenados = [...pronosticos].sort((a, b) => {
+        if (orden.startsWith("fecha")) {
+            const fechaA = new Date(a.partido.fecha).getTime();
+            const fechaB = new Date(b.partido.fecha).getTime();
+            const ambasFechasValidas =
+                Number.isFinite(fechaA) && Number.isFinite(fechaB);
 
-                <Box
-                    sx={{
-                        ml: "auto",
-                        px: 1.25,
-                        py: 0.5,
-                        borderRadius: "20px",
-                        bgcolor: "#EAF1FF",
-                        color: "#123C82",
-                        fontSize: "0.8rem",
-                        fontWeight: 700,
-                    }}
+            if (!ambasFechasValidas) {
+                if (Number.isFinite(fechaA)) return -1;
+                if (Number.isFinite(fechaB)) return 1;
+                return 0;
+            }
+
+            return orden === "fecha-desc" ? fechaB - fechaA : fechaA - fechaB;
+        }
+
+        const puntosA = Number(a.puntos ?? 0);
+        const puntosB = Number(b.puntos ?? 0);
+        return orden === "puntos-desc" ? puntosB - puntosA : puntosA - puntosB;
+    });
+
+    return (
+        <Box>
+            <FormControl
+                size="small"
+                sx={{ mb: 2, minWidth: { xs: "100%", sm: 240 } }}
+            >
+                <InputLabel id="orden-porras-label">Ordenar per</InputLabel>
+                <Select
+                    labelId="orden-porras-label"
+                    id="orden-porras"
+                    value={orden}
+                    label="Ordenar per"
+                    onChange={(event) => setOrden(event.target.value)}
                 >
-                    {predicciones.length}
-                </Box>
+                    <MenuItem value="fecha-desc">Data: més recent</MenuItem>
+                    <MenuItem value="fecha-asc">Data: més antiga</MenuItem>
+                    <MenuItem value="puntos-desc">Puntuació: de major a menor</MenuItem>
+                    <MenuItem value="puntos-asc">Puntuació: de menor a major</MenuItem>
+                </Select>
+            </FormControl>
+
+            <Stack spacing={1.5}>
+                {pronosticosOrdenados.map((pronostico) => (
+                    <PronosticoParticipanteCard
+                        key={pronostico.id}
+                        pronostico={pronostico}
+                    />
+                ))}
             </Stack>
-
-            {predicciones.length === 0 ? (
-                <Box
-                    sx={{
-                        py: 4,
-                        px: 2,
-                        textAlign: "center",
-                        border: "1px dashed #D4DEEC",
-                        borderRadius: "10px",
-                        bgcolor: "#F8FAFE",
-                    }}
-                >
-                    <Typography
-                        sx={{
-                            color: "#07152F",
-                            fontWeight: 700,
-                            mb: 0.5,
-                        }}
-                    >
-                        Todavía no hay predicciones
-                    </Typography>
-
-                    <Typography sx={{ color: "#53627A", fontSize: "0.9rem" }}>
-                        Este participante aún no ha realizado ninguna predicción.
-                    </Typography>
-                </Box>
-            ) : (
-                <Stack spacing={1.5}>
-                    {predicciones.map((prediccion) => (
-                        <PrediccionParticipanteCard
-                            key={prediccion.id}
-                            prediccion={prediccion}
-                        />
-                    ))}
-                </Stack>
-            )}
-        </Paper>
+        </Box>
     );
 }
 
