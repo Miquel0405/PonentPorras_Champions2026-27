@@ -12,6 +12,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import BackIcon from "@mui/icons-material/ArrowBack";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
+import TableChartIcon from '@mui/icons-material/TableChart';
 
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -22,6 +23,7 @@ import ParticipanteBanner from "../components/participantes/ParticipanteBanner";
 import ParticipanteInfo from "../components/participantes/ParticipanteInfo";
 import ParticipantePorras from "../components/participantes/ParticipantePorras";
 import ParticipanteGraphs from "../components/participantes/ParticipanteGraphs";
+import ParticipanteTablaEquipos from "../components/participantes/ParticipanteTablaEquipos";
 
 function ParticipantePage() {
     const { participanteId } = useParams();
@@ -179,6 +181,13 @@ function ParticipantePage() {
                         iconPosition="start"
                         label="Gràfiques"
                     />
+                    <Tab
+                        id="participante-tab-tabla-equipos"
+                        aria-controls="participante-panel-tabla-equipos"
+                        icon={<TableChartIcon />}
+                        iconPosition="start"
+                        label="Taula d'equips"
+                    />
                 </Tabs>
 
                 <Box
@@ -195,11 +204,13 @@ function ParticipantePage() {
                         "participante-panel-informacion",
                         "participante-panel-porras",
                         "participante-panel-graficas",
+                        "participante-panel-tabla-equipos",
                     ][seccionActiva]}
                     aria-labelledby={[
                         "participante-tab-informacion",
                         "participante-tab-porras",
                         "participante-tab-graficas",
+                        "participante-tab-tabla-equipos",
                     ][seccionActiva]}
                     tabIndex={0}
                 >
@@ -209,8 +220,12 @@ function ParticipantePage() {
                         <ParticipantePorras
                             pronosticos={participante.pronosticos ?? []}
                         />
-                    ) : (
+                    ) : seccionActiva === 2 ? (
                         <ParticipanteGraphs />
+                    ) : (
+                        <ParticipanteTablaEquipos
+                            pronosticos={participante.pronosticos ?? []}
+                        />
                     )}
                 </Box>
             </Paper>

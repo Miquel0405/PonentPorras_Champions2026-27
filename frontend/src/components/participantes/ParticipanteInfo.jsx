@@ -1,8 +1,85 @@
 import { Box, Typography } from "@mui/material";
+import EscudoEquipo from "../partidos/EscudoEquipo";
 
 function ParticipanteInfo({ participante }) {
     const totalPorres = participante.pronosticos?.length ?? 0;
     const encertsSenseErrors = totalPorres - (participante.errores ?? 0);
+    const puntosPorEquipo = new Map();
+
+    (participante.pronosticos ?? []).forEach((pronostico) => {
+        const puntos = Number(pronostico.puntos ?? 0);
+        const partido = pronostico.partido;
+
+        const equiposDelPartido = new Map(
+            [partido?.equipo_local, partido?.equipo_visitante]
+                .filter((equipo) => equipo && equipo.id != null)
+                .map((equipo) => [equipo.id, equipo])
+        );
+
+        equiposDelPartido.forEach((equipo) => {
+            if (!puntosPorEquipo.has(equipo.id)) {
+                puntosPorEquipo.set(equipo.id, {
+                    equipo,
+                    puntos: 0,
+                    pronosticos: 0,
+                    plenos: 0,
+                    ddg: 0,
+                    x1x2: 0,
+                    errores: 0,
+                });
+            }
+
+            const estadisticasEquipo = puntosPorEquipo.get(equipo.id);
+            estadisticasEquipo.puntos += Number.isFinite(puntos) ? puntos : 0;
+            estadisticasEquipo.pronosticos += 1;
+
+            switch (Number(pronostico.estado)) {
+                case 3:
+                    estadisticasEquipo.plenos += 1;
+                    break;
+                case 2:
+                    estadisticasEquipo.ddg += 1;
+                    break;
+                case 1:
+                    estadisticasEquipo.x1x2 += 1;
+                    break;
+                case 0:
+                    estadisticasEquipo.errores += 1;
+                    break;
+                default:
+                    break;
+            }
+        });
+    });
+
+    const equiposOrdenados = [...puntosPorEquipo.values()].sort(
+        (a, b) =>
+            b.puntos - a.puntos ||
+            a.pronosticos - b.pronosticos ||
+            b.plenos - a.plenos ||
+            b.ddg - a.ddg ||
+            b.x1x2 - a.x1x2 ||
+            a.equipo.nombre.localeCompare(b.equipo.nombre, "es")
+    );
+    const equiposDestacados = [
+        {
+            label: "Equip(s) fetitxe (més punts)",
+            equipos: equiposOrdenados.slice(0, 1),
+            color: "#16803C",
+            background: "#F0FAF2",
+            border: "#B7E2C1",
+        },
+        {
+            label: "Equip(s) fraude(s) (menys punts)",
+            equipos:
+                equiposOrdenados.length > 0
+                    ? [equiposOrdenados[equiposOrdenados.length - 1]]
+                    : [],
+            color: "#C62828",
+            background: "#FFF1F1",
+            border: "#F0B8B8",
+        },
+    ];
 
     const informacionGeneral = [
         ["Porres registrades", totalPorres],
@@ -197,6 +274,97 @@ function ParticipanteInfo({ participante }) {
                         </Box>
                     ))}
                 </Box>
+            </Box>
+
+            <Box component="fieldset" sx={{ ...fieldsetSx, mt: 2 }}>
+                <Typography
+                    component="legend"
+                    sx={{ px: 1, color: "#07152F", fontWeight: 700 }}
+                >
+                    Millors/Pitjors equips
+                </Typography>
+                {equiposOrdenados.length === 0 ? (
+                    <Typography sx={labelSx}>
+                        Encara no hi ha dades per equip.
+                    </Typography>
+                ) : (
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: {
+                                xs: "1fr",
+                                md: "repeat(2, minmax(0, 1fr))",
+                            },
+                            gap: 1.5,
+                        }}
+                    >
+                        {equiposDestacados.map((destacado) => (
+                            <Box
+                                key={destacado.label}
+                                sx={{
+                                    px: 1.5,
+                                    py: 1.25,
+                                    bgcolor: destacado.background,
+                                    border: `1px solid ${destacado.border}`,
+                                    borderRadius: "8px",
+                                }}
+                            >
+                                <Typography
+                                    sx={{
+                                        mb: 1,
+                                        color: destacado.color,
+                                        fontSize: "0.9rem",
+                                        fontWeight: 800,
+                                    }}
+                                >
+                                    {destacado.label}
+                                </Typography>
+                                <Box sx={{ display: "grid", gap: 1 }}>
+                                    {destacado.equipos.map(({ equipo, puntos }) => (
+                                        <Box
+                                            key={equipo.id}
+                                            sx={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "space-between",
+                                                gap: 1,
+                                            }}
+                                        >
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: 1,
+                                                    minWidth: 0,
+                                                }}
+                                            >
+                                                <EscudoEquipo equipo={equipo} size={32} />
+                                                <Typography
+                                                    sx={{
+                                                        color: "#07152F",
+                                                        fontWeight: 700,
+                                                        overflowWrap: "anywhere",
+                                                    }}
+                                                >
+                                                    {equipo.nombre}
+                                                </Typography>
+                                            </Box>
+                                            <Typography
+                                                sx={{
+                                                    color: destacado.color,
+                                                    fontWeight: 900,
+                                                    whiteSpace: "nowrap",
+                                                }}
+                                            >
+                                                {puntos} punts
+                                            </Typography>
+                                        </Box>
+                                    ))}
+                                </Box>
+                            </Box>
+                        ))}
+                    </Box>
+                )}
             </Box>
         </Box>
     );
