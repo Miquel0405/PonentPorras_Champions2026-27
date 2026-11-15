@@ -142,21 +142,21 @@ function ParticipanteCard({ participante, posicion }) {
                             <Typography
                                 component="span"
                                 aria-label={`${participante.nb_plenos ?? 0} plenos`}
-                                sx={{ color: "#16803C", fontSize: "0.7rem", fontWeight: 700 }}
+                                sx={{ color: "var(--color-text-pleno)", fontSize: "0.7rem", fontWeight: 700 }}
                             >
                                 {participante.nb_plenos ?? 0} PLENOS
                             </Typography>
                             <Typography
                                 component="span"
                                 aria-label={`${participante.nb_ddg ?? 0} diferencias de goles`}
-                                sx={{ color: "#e4c55f", fontSize: "0.7rem", fontWeight: 700 }}
+                                sx={{ color: "var(--color-text-ddg)", fontSize: "0.7rem", fontWeight: 700 }}
                             >
                                 {participante.nb_ddg ?? 0} DDG
                             </Typography>
                             <Typography
                                 component="span"
                                 aria-label={`${participante.nb_1x2 ?? 0} aciertos 1X2`}
-                                sx={{ color: "#C45B13", fontSize: "0.7rem", fontWeight: 700 }}
+                                sx={{ color: "var(--color-text-1x2)", fontSize: "0.7rem", fontWeight: 700 }}
                             >
                                 {participante.nb_1x2 ?? 0} 1X2
                             </Typography>

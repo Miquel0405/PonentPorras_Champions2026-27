@@ -63,21 +63,21 @@ function ParticipanteInfo({ participante }) {
     );
     const equiposDestacados = [
         {
-            label: "Equip(s) fetitxe (més punts)",
+            label: "Equip estrella (més punts)",
             equipos: equiposOrdenados.slice(0, 1),
-            color: "#16803C",
-            background: "#F0FAF2",
-            border: "#B7E2C1",
+            color: "var(--color-text-best)",
+            background: "var(--color-back-best)",
+            border: "var(--color-border-best)",
         },
         {
-            label: "Equip(s) fraude(s) (menys punts)",
+            label: "Equip fraude (menys punts)",
             equipos:
                 equiposOrdenados.length > 0
                     ? [equiposOrdenados[equiposOrdenados.length - 1]]
                     : [],
-            color: "#C62828",
-            background: "#FFF1F1",
-            border: "#F0B8B8",
+            color: "var(--color-text-worst)",
+            background: "var(--color-back-worst)",
+            border: "var(--color-border-worst)",
         },
     ];
 
@@ -105,30 +105,30 @@ function ParticipanteInfo({ participante }) {
         {
             label: "Plenos",
             total: participante.plenos ?? 0,
-            color: "#16803C",
-            background: "#F0FAF2",
-            border: "#B7E2C1",
+            color: "var(--color-text-pleno)",
+            background: "var(--color-back-pleno)",
+            border: "var(--color-border-pleno)",
         },
         {
             label: "Diferència de gols (DDG)",
             total: participante.ddg ?? 0,
-            color: "#987000",
-            background: "#FFF9E6",
-            border: "#F0D98A",
+            color: "var(--color-text-ddg)",
+            background: "var(--color-back-ddg)",
+            border: "var(--color-border-ddg)",
         },
         {
             label: "Encerts 1X2",
             total: participante.x1x2 ?? 0,
-            color: "#C45B13",
-            background: "#FFF4EB",
-            border: "#F2C7A7",
+            color: "var(--color-text-1x2)",
+            background: "var(--color-back-1x2)",
+            border: "var(--color-border-1x2)",
         },
         {
             label: "Errors totals",
             total: participante.errores ?? 0,
-            color: "#C62828",
-            background: "#FFF1F1",
-            border: "#F0B8B8",
+            color: "var(--color-text-error)",
+            background: "var(--color-back-error)",
+            border: "var(--color-border-error)",
         },
     ].map((estadistica) => ({
         ...estadistica,

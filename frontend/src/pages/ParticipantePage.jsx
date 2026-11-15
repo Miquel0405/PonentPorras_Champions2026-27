@@ -221,7 +221,7 @@ function ParticipantePage() {
                             pronosticos={participante.pronosticos ?? []}
                         />
                     ) : seccionActiva === 2 ? (
-                        <ParticipanteGraphs />
+                        <ParticipanteGraphs participante={participante} />
                     ) : (
                         <ParticipanteTablaEquipos
                             pronosticos={participante.pronosticos ?? []}
