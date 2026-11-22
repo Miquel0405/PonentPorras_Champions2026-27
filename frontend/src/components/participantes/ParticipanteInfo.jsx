@@ -16,7 +16,26 @@ function formatearDia(clave) {
     return `${diaSemanaCapitalizado} ${day} de ${mes} de ${year}`;
 }
 
+const estilosPalmares = {
+    1: {
+        background: "#FFF7E5",
+        border: "#E8BD65",
+        color: "#9A6B00",
+    },
+    2: {
+        background: "#F1F4F8",
+        border: "#B8C2CF",
+        color: "#53627A",
+    },
+    3: {
+        background: "#FBF0E8",
+        border: "#BC8056",
+        color: "#89552F",
+    },
+};
+
 function ParticipanteInfo({ participante }) {
+    const palmares = participante.palmares ?? [];
     const totalPorres = participante.pronosticos?.length ?? 0;
     const encertsSenseErrors = totalPorres - (participante.errores ?? 0);
     const puntosPorEquipo = new Map();
@@ -656,6 +675,66 @@ function ParticipanteInfo({ participante }) {
             </Box>
                 </Box>
             </Box>
+            {palmares.length > 0 && (
+                <Box component="fieldset" sx={{ ...fieldsetSx, mt: 2 }}>
+                    <Typography
+                        component="legend"
+                        sx={{ px: 1, color: "#07152F", fontWeight: 700 }}
+                    >
+                        Palmarès
+                    </Typography>
+                    <Box sx={{ display: "grid", gap: 1 }}>
+                        {palmares.map((merito) => {
+                            const estilo = estilosPalmares[merito.posicion];
+
+                            return (
+                                <Box
+                                    key={merito.id}
+                                    sx={{
+                                        display: "grid",
+                                        gridTemplateColumns: {
+                                            xs: "1fr",
+                                            sm: "minmax(0, 1fr) auto",
+                                        },
+                                        alignItems: "start",
+                                        gap: 1,
+                                        px: 1.5,
+                                        py: 1.25,
+                                        bgcolor: estilo?.background ?? "#F3F6FC",
+                                        border: `1px solid ${estilo?.border ?? "#D7DFEB"}`,
+                                        borderRadius: "8px",
+                                    }}
+                                >
+                                    <Box>
+                                        <Typography
+                                            sx={{
+                                                color: "#07152F",
+                                                fontWeight: 800,
+                                                overflowWrap: "anywhere",
+                                            }}
+                                        >
+                                            {merito.competicion}
+                                        </Typography>
+                                        <Typography sx={{ ...labelSx, mt: 0.5 }}>
+                                            {merito.descripcion}
+                                        </Typography>
+                                    </Box>
+                                    <Typography
+                                        sx={{
+                                            color: estilo?.color ?? "#53627A",
+                                            fontWeight: 800,
+                                            textAlign: { xs: "left", sm: "right" },
+                                            whiteSpace: "nowrap",
+                                        }}
+                                    >
+                                        {merito.posicion}º lloc
+                                    </Typography>
+                                </Box>
+                            );
+                        })}
+                    </Box>
+                </Box>
+            )}
         </Box>
     );
 }
