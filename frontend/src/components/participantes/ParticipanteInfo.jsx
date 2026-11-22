@@ -1,20 +1,75 @@
 import { Box, Typography } from "@mui/material";
 import EscudoEquipo from "../partidos/EscudoEquipo";
 
+function formatearDia(clave) {
+    if (!clave) {
+        return "";
+    }
+
+    const [year, month, day] = clave.split("-").map(Number);
+    const fecha = new Date(year, month - 1, day);
+    const diaSemana = fecha.toLocaleDateString("ca-ES", { weekday: "long" });
+    const mes = fecha.toLocaleDateString("ca-ES", { month: "long" });
+    const diaSemanaCapitalizado =
+        diaSemana.charAt(0).toLocaleUpperCase("ca-ES") + diaSemana.slice(1);
+
+    return `${diaSemanaCapitalizado} ${day} de ${mes} de ${year}`;
+}
+
 function ParticipanteInfo({ participante }) {
     const totalPorres = participante.pronosticos?.length ?? 0;
     const encertsSenseErrors = totalPorres - (participante.errores ?? 0);
     const puntosPorEquipo = new Map();
+    const puntosPorJornada = new Map();
+    const puntosPorDia = new Map();
 
     (participante.pronosticos ?? []).forEach((pronostico) => {
         const puntos = Number(pronostico.puntos ?? 0);
         const partido = pronostico.partido;
+        const fecha = typeof partido?.fecha === "string"
+            ? partido.fecha
+            : "";
+        const coincidenciaDia = fecha.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        const dia = coincidenciaDia
+            ? `${coincidenciaDia[1]}-${coincidenciaDia[2]}-${coincidenciaDia[3]}`
+            : null;
 
         const equiposDelPartido = new Map(
             [partido?.equipo_local, partido?.equipo_visitante]
                 .filter((equipo) => equipo && equipo.id != null)
                 .map((equipo) => [equipo.id, equipo])
         );
+
+        const jornada = partido?.fase?.trim() || "Sin fase";
+        if (!puntosPorJornada.has(jornada)) {
+            puntosPorJornada.set(jornada, {
+                jornada,
+                puntos: 0,
+                pronosticos: 0,
+            });
+        }
+        const estadisticasJornada = puntosPorJornada.get(jornada);
+        estadisticasJornada.puntos += Number.isFinite(puntos) ? puntos : 0;
+        estadisticasJornada.pronosticos += 1;
+
+        if (dia) {
+            if (!puntosPorDia.has(dia)) {
+                puntosPorDia.set(dia, {
+                    dia,
+                    fases: [],
+                    puntos: 0,
+                    pronosticos: 0,
+                });
+            }
+
+            const estadisticasDia = puntosPorDia.get(dia);
+            const fase = partido.fase?.trim() || "Sin fase";
+            if (!estadisticasDia.fases.includes(fase)) {
+                estadisticasDia.fases.push(fase);
+            }
+            estadisticasDia.puntos += Number.isFinite(puntos) ? puntos : 0;
+            estadisticasDia.pronosticos += 1;
+        }
 
         equiposDelPartido.forEach((equipo) => {
             if (!puntosPorEquipo.has(equipo.id)) {
@@ -61,6 +116,23 @@ function ParticipanteInfo({ participante }) {
             b.x1x2 - a.x1x2 ||
             a.equipo.nombre.localeCompare(b.equipo.nombre, "es")
     );
+
+    const diasOrdenados = [...puntosPorDia.values()].sort(
+        (a, b) =>
+            b.puntos - a.puntos ||
+            (b.puntos / b.pronosticos) - (a.puntos / a.pronosticos) ||
+            b.pronosticos - a.pronosticos ||
+            b.dia.localeCompare(a.dia)
+    );
+
+    const jornadasOrdenadas = [...puntosPorJornada.values()].sort(
+        (a, b) =>
+            b.puntos - a.puntos ||
+            (b.puntos / b.pronosticos) - (a.puntos / a.pronosticos) ||
+            b.pronosticos - a.pronosticos ||
+            a.jornada.localeCompare(b.jornada, "es")
+    );
+
     const equiposDestacados = [
         {
             label: "Equip estrella (més punts)",
@@ -75,6 +147,46 @@ function ParticipanteInfo({ participante }) {
                 equiposOrdenados.length > 0
                     ? [equiposOrdenados[equiposOrdenados.length - 1]]
                     : [],
+            color: "var(--color-text-worst)",
+            background: "var(--color-back-worst)",
+            border: "var(--color-border-worst)",
+        },
+    ];
+
+    const diasDestacados = [
+        {
+            label: "Nit de glòria (més punts)",
+            dia: diasOrdenados[0],
+            color: "var(--color-text-best)",
+            background: "var(--color-back-best)",
+            border: "var(--color-border-best)",
+        },
+        {
+            label: "Nit de malson (menys punts)",
+            dia:
+                diasOrdenados.length > 0
+                    ? diasOrdenados[diasOrdenados.length - 1]
+                    : null,
+            color: "var(--color-text-worst)",
+            background: "var(--color-back-worst)",
+            border: "var(--color-border-worst)",
+        },
+    ];
+
+    const jornadasDestacadas = [
+        {
+            label: "Millor jornada (més punts)",
+            jornada: jornadasOrdenadas[0],
+            color: "var(--color-text-best)",
+            background: "var(--color-back-best)",
+            border: "var(--color-border-best)",
+        },
+        {
+            label: "Pitjor jornada (menys punts)",
+            jornada:
+                jornadasOrdenadas.length > 0
+                    ? jornadasOrdenadas[jornadasOrdenadas.length - 1]
+                    : null,
             color: "var(--color-text-worst)",
             background: "var(--color-back-worst)",
             border: "var(--color-border-worst)",
@@ -281,7 +393,22 @@ function ParticipanteInfo({ participante }) {
                     component="legend"
                     sx={{ px: 1, color: "#07152F", fontWeight: 700 }}
                 >
-                    Millors/Pitjors equips
+                    Millors i pitjors
+                </Typography>
+                <Box
+                    sx={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr",
+                        alignItems: "start",
+                        gap: 1.5,
+                    }}
+                >
+            <Box component="fieldset" sx={fieldsetSx}>
+                <Typography
+                    component="legend"
+                    sx={{ px: 1, color: "#07152F", fontWeight: 700 }}
+                >
+                    Equips
                 </Typography>
                 {equiposOrdenados.length === 0 ? (
                     <Typography sx={labelSx}>
@@ -291,10 +418,7 @@ function ParticipanteInfo({ participante }) {
                     <Box
                         sx={{
                             display: "grid",
-                            gridTemplateColumns: {
-                                xs: "1fr",
-                                md: "repeat(2, minmax(0, 1fr))",
-                            },
+                            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
                             gap: 1.5,
                         }}
                     >
@@ -320,7 +444,7 @@ function ParticipanteInfo({ participante }) {
                                     {destacado.label}
                                 </Typography>
                                 <Box sx={{ display: "grid", gap: 1 }}>
-                                    {destacado.equipos.map(({ equipo, puntos }) => (
+                                    {destacado.equipos.map(({ equipo, puntos, pronosticos }) => (
                                         <Box
                                             key={equipo.id}
                                             sx={{
@@ -349,15 +473,22 @@ function ParticipanteInfo({ participante }) {
                                                     {equipo.nombre}
                                                 </Typography>
                                             </Box>
-                                            <Typography
-                                                sx={{
-                                                    color: destacado.color,
-                                                    fontWeight: 900,
-                                                    whiteSpace: "nowrap",
-                                                }}
-                                            >
-                                                {puntos} punts
-                                            </Typography>
+                                            <Box sx={{ textAlign: "right" }}>
+                                                <Typography
+                                                    sx={{
+                                                        color: destacado.color,
+                                                        fontWeight: 900,
+                                                        whiteSpace: "nowrap",
+                                                    }}
+                                                >
+                                                    {puntos} punts
+                                                </Typography>
+                                                <Typography
+                                                    sx={{ fontSize: "0.75rem", lineHeight: 1.2, color: destacado.color,}}
+                                                >
+                                                    {pronosticos} {pronosticos === 1 ? "partit" : "partits"}
+                                                </Typography>
+                                            </Box>
                                         </Box>
                                     ))}
                                 </Box>
@@ -365,6 +496,165 @@ function ParticipanteInfo({ participante }) {
                         ))}
                     </Box>
                 )}
+            </Box>
+            <Box component="fieldset" sx={fieldsetSx}>
+                <Typography
+                    component="legend"
+                    sx={{ px: 1, color: "#07152F", fontWeight: 700 }}
+                >
+                    Jornades
+                </Typography>
+                {jornadasOrdenadas.length === 0 ? (
+                    <Typography sx={labelSx}>
+                        No hi ha dades de jornades.
+                    </Typography>
+                ) : (
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                            gap: 1.5,
+                        }}
+                    >
+                        {jornadasDestacadas.map((destacado) => (
+                            <Box
+                                key={destacado.label}
+                                sx={{
+                                    px: 1.5,
+                                    py: 1.25,
+                                    bgcolor: destacado.background,
+                                    border: `1px solid ${destacado.border}`,
+                                    borderRadius: "8px",
+                                }}
+                            >
+                                <Typography
+                                    sx={{
+                                        mb: 1,
+                                        color: destacado.color,
+                                        fontSize: "0.9rem",
+                                        fontWeight: 800,
+                                    }}
+                                >
+                                    {destacado.label}
+                                </Typography>
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                        gap: 1,
+                                    }}
+                                >
+                                    <Typography
+                                        sx={{
+                                            color: "#07152F",
+                                            fontWeight: 700,
+                                            overflowWrap: "anywhere",
+                                        }}
+                                    >
+                                        {destacado.jornada?.jornada}
+                                    </Typography>
+                                    <Box sx={{ textAlign: "right" }}>
+                                        <Typography
+                                            sx={{
+                                                color: destacado.color,
+                                                fontWeight: 900,
+                                                whiteSpace: "nowrap",
+                                            }}
+                                        >
+                                            {destacado.jornada?.puntos ?? 0} punts
+                                        </Typography>
+                                        <Typography sx={{ fontSize: "0.75rem", lineHeight: 1.2, color: destacado.color,}}>
+                                            {destacado.jornada?.pronosticos ?? 0} {destacado.jornada?.pronosticos === 1 ? "partit" : "partits"}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </Box>
+                        ))}
+                    </Box>
+                )}
+            </Box>
+            <Box component="fieldset" sx={fieldsetSx}>
+                <Typography
+                    component="legend"
+                    sx={{ px: 1, color: "#07152F", fontWeight: 700 }}
+                >
+                    Dies
+                </Typography>
+                {diasOrdenados.length === 0 ? (
+                    <Typography sx={labelSx}>
+                        Encara no hi ha dades per dies.
+                    </Typography>
+                ) : (
+                    <Box
+                        sx={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                            gap: 1.5,
+                        }}
+                    >
+                        {diasDestacados.map((destacado) => (
+                            <Box
+                                key={destacado.label}
+                                sx={{
+                                    px: 1.5,
+                                    py: 1.25,
+                                    bgcolor: destacado.background,
+                                    border: `1px solid ${destacado.border}`,
+                                    borderRadius: "8px",
+                                }}
+                            >
+                                <Typography
+                                    sx={{
+                                        mb: 1,
+                                        color: destacado.color,
+                                        fontSize: "0.9rem",
+                                        fontWeight: 800,
+                                    }}
+                                >
+                                    {destacado.label}
+                                </Typography>
+                                <Box sx={{ display: "grid", gap: 1 }}>
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
+                                            gap: 2,
+                                            minWidth: 0,
+                                        }}
+                                    >
+                                        <Typography
+                                            sx={{
+                                                color: "#07152F",
+                                                fontWeight: 700,
+                                                overflowWrap: "anywhere",
+                                            }}
+                                        >
+                                            {formatearDia(destacado.dia?.dia)} ({destacado.dia?.fases.join(", ")})
+                                        </Typography>
+                                        <Box sx={{ textAlign: "right" }}>
+                                            <Typography
+                                                sx={{
+                                                    color: destacado.color,
+                                                    fontWeight: 900,
+                                                    whiteSpace: "nowrap",
+                                                }}
+                                            >
+                                                {destacado.dia?.puntos ?? 0} punts
+                                            </Typography>
+                                            <Typography sx={{ fontSize: "0.75rem", lineHeight: 1.2, color: destacado.color, }}>
+                                                {destacado.dia?.pronosticos ?? 0} {destacado.dia?.pronosticos === 1 ? "partit" : "partits"}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            </Box>
+                        ))}
+                    </Box>
+                )}
+            </Box>
+                </Box>
             </Box>
         </Box>
     );

@@ -25,3 +25,4 @@ postman/
 .vercel
 .env*
 backend/core_data.json
+backend/*.dump

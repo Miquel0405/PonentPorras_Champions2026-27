@@ -1,6 +1,8 @@
 import { Box, Paper, Typography } from "@mui/material";
 import DistribResultadosParticipante from "../graficos/DistribResultadosParticipante";
 import DistribPuntosParticipante from "../graficos/DistribPuntosParticipante";
+import EvoPuntosDiaParticipante from "../graficos/EvoPuntosDiaParticipante";
+import EvoPuntosJornadaParticipante from "../graficos/EvoPuntosJornadaParticipante";
 
 function ParticipanteGraphs({ participante }) {
     const gruposGraficos = [
@@ -18,11 +20,20 @@ function ParticipanteGraphs({ participante }) {
                 />,
             ],
         },
-        // {
-        //     id: "evolucio",
-        //     title: "Evolució",
-        //     chart: <EvoPuntosPorJornada pronosticos={pronosticos} />,
-        // },
+        {
+            id: "evolucio",
+            title: "Gràfics de evolució al llarg del temps",
+            charts: [
+                <EvoPuntosDiaParticipante
+                    key="evolucio-dies"
+                    participante={participante}
+                />,
+                <EvoPuntosJornadaParticipante
+                    key="evolucio-jornades"
+                    participante={participante}
+                />,
+            ],
+        },
         // {
         //     id: "barres",
         //     title: "Gràfics de barres",
