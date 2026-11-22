@@ -1,10 +1,15 @@
 from rest_framework import serializers
 
 from ..models import Participante
-from .models_serializers import PronosticoSerializer, ParticipanteSerializer
+from .models_serializers import (
+    PalmaresSerializer,
+    ParticipanteSerializer,
+    PronosticoSerializer,
+)
 
 class ParticipanteWithPronosticosSerializer(ParticipanteSerializer):
     pronosticos = PronosticoSerializer(many=True, read_only=True, exclude_fields=["participante", "participante_id"])
+    palmares = PalmaresSerializer(many=True, read_only=True)
     puntos = serializers.SerializerMethodField()
     plenos = serializers.SerializerMethodField()
     ddg = serializers.SerializerMethodField()
@@ -13,7 +18,7 @@ class ParticipanteWithPronosticosSerializer(ParticipanteSerializer):
 
     class Meta(ParticipanteSerializer.Meta):
         model = Participante
-        fields = ParticipanteSerializer.Meta.fields + ["pronosticos", "puntos", "plenos", "ddg", "x1x2", "errores"]
+        fields = ParticipanteSerializer.Meta.fields + ["pronosticos", "palmares", "puntos", "plenos", "ddg", "x1x2", "errores"]
 
     def get_puntos(self, obj):
         return sum(prediccion.puntos for prediccion in obj.pronosticos.all())
