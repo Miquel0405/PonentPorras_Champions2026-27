@@ -50,18 +50,29 @@ function PartidoCard({ partido }) {
                 onClick={() => navigate(`/partidos/${partido.id}`)}
                 sx={{ height: "100%" }}
             >
-                <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
+                <CardContent
+                    sx={{
+                        p: { xs: 1.5, sm: 2 },
+                        "&:last-child": { pb: { xs: 1.5, sm: 2 } },
+                    }}
+                >
                     <Stack
-                        direction="row"
-                        alignItems="center"
-                        spacing={2}
+                        direction={{ xs: "column", md: "row" }}
+                        alignItems={{ xs: "stretch", md: "center" }}
+                        spacing={{ xs: 1.5, md: 2 }}
                     >
-                        <Box
+                        <Stack
+                            direction={{ xs: "row", md: "column" }}
+                            alignItems="center"
+                            justifyContent={{ xs: "space-between", md: "center" }}
+                            spacing={{ xs: 1, md: 0 }}
                             sx={{
-                                minWidth: 58,
-                                textAlign: "center",
-                                borderRight: "1px solid #E1E7F0",
-                                pr: 2,
+                                minWidth: { xs: 0, md: 58 },
+                                flexShrink: 0,
+                                borderRight: { xs: 0, md: "1px solid #E1E7F0" },
+                                borderBottom: { xs: "1px solid #E1E7F0", md: 0 },
+                                pr: { xs: 0, md: 2 },
+                                pb: { xs: 1, md: 0 },
                             }}
                         >
                             <Typography
@@ -81,34 +92,60 @@ function PartidoCard({ partido }) {
                             >
                                 {hora}
                             </Typography>
-                        </Box>
+                        </Stack>
 
                         <Stack
                             spacing={1}
                             sx={{ flex: 1, minWidth: 0 }}
                         >
-                            <Stack direction="row" alignItems="center" spacing={1}>
+                            <Stack
+                                direction="row"
+                                alignItems="center"
+                                spacing={1}
+                                sx={{ minWidth: 0 }}
+                            >
                                 <EscudoEquipo equipo={partido.equipo_local} size={30} />
                                 <Typography
                                     sx={{
+                                        minWidth: 0,
+                                        flex: 1,
                                         color: "#07152F",
                                         fontWeight: 700,
-                                        fontSize: "0.95rem",
-                                        overflowWrap: "anywhere",
+                                        fontSize: {
+                                            xs: "clamp(0.7rem, 3.6vw, 0.95rem)",
+                                            md: "0.95rem",
+                                        },
+                                        lineHeight: 1.35,
+                                        whiteSpace: "nowrap",
+                                        overflowX: "auto",
+                                        scrollbarWidth: "thin",
                                     }}
                                 >
                                     {partido.equipo_local.nombre}
                                 </Typography>
                             </Stack>
 
-                            <Stack direction="row" alignItems="center" spacing={1}>
+                            <Stack
+                                direction="row"
+                                alignItems="center"
+                                spacing={1}
+                                sx={{ minWidth: 0 }}
+                            >
                                 <EscudoEquipo equipo={partido.equipo_visitante} size={30} />
                                 <Typography
                                     sx={{
+                                        minWidth: 0,
+                                        flex: 1,
                                         color: "#07152F",
                                         fontWeight: 700,
-                                        fontSize: "0.95rem",
-                                        overflowWrap: "anywhere",
+                                        fontSize: {
+                                            xs: "clamp(0.7rem, 3.6vw, 0.95rem)",
+                                            md: "0.95rem",
+                                        },
+                                        lineHeight: 1.35,
+                                        whiteSpace: "nowrap",
+                                        overflowX: "auto",
+                                        scrollbarWidth: "thin",
                                     }}
                                 >
                                     {partido.equipo_visitante.nombre}
@@ -119,7 +156,7 @@ function PartidoCard({ partido }) {
                         <Box
                             sx={{
                                 minWidth: 52,
-                                textAlign: "center",
+                                textAlign: { xs: "left", md: "center" },
                                 flexShrink: 0,
                             }}
                         >

@@ -6,19 +6,18 @@ import {
     Tab,
     Tabs,
     Typography,
-    Button,
 } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import BackIcon from "@mui/icons-material/ArrowBack";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import TableChartIcon from '@mui/icons-material/TableChart';
 
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { getParticipante } from "../api/api";
 
+import PageBackButton from "../components/common/PageBackButton";
 import ParticipanteBanner from "../components/participantes/ParticipanteBanner";
 import ParticipanteInfo from "../components/participantes/ParticipanteInfo";
 import ParticipantePorras from "../components/participantes/ParticipantePorras";
@@ -93,33 +92,9 @@ function ParticipantePage() {
 
     return (
         <Box>
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    gap: 1,
-                    mb: 2,
-                }}
-            >
-                <Button
-                    component={Link}
-                    to="/clasificacion"
-                    variant="outlined"
-                    startIcon={<BackIcon/>}
-                    sx={{
-                        color: "#F3F6FC",
-                        borderColor: "#123C82",
-                        borderRadius: "8px",
-                        textTransform: "none",
-                        fontWeight: 700,
-                        "&:hover": {
-                            backgroundColor: "#3478F6",
-                        },
-                    }}
-                >
-                    Tornar a la classificació
-                </Button>
-            </Box>
+            <PageBackButton to="/clasificacion">
+                Tornar a la classificació
+            </PageBackButton>
             <ParticipanteBanner participante={participante} />
 
             <Paper
@@ -138,7 +113,9 @@ function ParticipantePage() {
                     value={seccionActiva}
                     onChange={(_, value) => setSeccionActiva(value)}
                     aria-label="Secciones del participante"
-                    variant="right"
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    allowScrollButtonsMobile
                     sx={{
                         minHeight: 56,
                         "& .MuiTabs-indicator": {

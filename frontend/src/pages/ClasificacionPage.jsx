@@ -2,50 +2,23 @@
 import {
     Box,
     Paper,
-    Typography,
-    Button,
     Stack,
+    Typography,
 } from "@mui/material";
-import BackIcon from "@mui/icons-material/ArrowBack";
-import { Link} from "react-router-dom";
+import PageBackButton from "../components/common/PageBackButton";
 import Clasificacion from "../components/clasificacion/Clasificacion";
 
 function ClasificacionPage() {
     return (
         <Box>
+            <PageBackButton to="/">Tornar al inici</PageBackButton>
             <Stack
                 direction={{ xs: "column", sm: "row" }}
                 alignItems={{ xs: "stretch", sm: "center" }}
                 justifyContent="space-between"
                 spacing={2}
-                sx={{ mb: 3, position: "relative"}}
+                sx={{ mb: 3 }}
             >
-                <Box
-                    sx={{
-                        position : "absolute",
-                        top: 0,
-                        right: 0,
-                    }}
-                >
-                    <Button
-                        component={Link}
-                        to="/"
-                        variant="outlined"
-                        startIcon={<BackIcon />}
-                        sx={{
-                            color: "#F3F6FC",
-                            borderColor: "#123C82",
-                            borderRadius: "8px",
-                            textTransform: "none",
-                            fontWeight: 700,
-                            "&:hover": {
-                                backgroundColor: "#3478F6",
-                            },
-                        }}
-                    >
-                        Tornar al inici
-                    </Button>
-                </Box>
                 <Box sx={{ mb: 3 }}>
                     <Typography
                         component="h1"

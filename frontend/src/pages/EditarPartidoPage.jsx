@@ -6,16 +6,16 @@ import {
     Paper,
     Typography,
 } from "@mui/material";
-import BackIcon from "@mui/icons-material/ArrowBack";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import {
     getPartido,
     getParticipantes,
     guardarEdicionPartido,
 } from "../api/api";
+import PageBackButton from "../components/common/PageBackButton";
 import PartidoBanner from "../components/partidos/PartidoBanner";
 import PartidoPorras from "../components/partidos/PartidoPorras";
 
@@ -196,6 +196,12 @@ function EditarPartidoPage() {
 
     return (
         <Box>
+            <PageBackButton
+                to={`/partidos/${partidoId}`}
+                disabled={guardando}
+            >
+                Tornar al partit
+            </PageBackButton>
             <Box
                 sx={{
                     display: "flex",
@@ -218,25 +224,6 @@ function EditarPartidoPage() {
                 </Typography>
 
                 <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                    <Button
-                        component={Link}
-                        to={`/partidos/${partidoId}`}
-                        variant="outlined"
-                        startIcon={<BackIcon />}
-                        disabled={guardando}
-                        sx={{
-                            color: "#F3F6FC",
-                            borderColor: "#123C82",
-                            borderRadius: "8px",
-                            textTransform: "none",
-                            fontWeight: 700,
-                            "&:hover": {
-                                backgroundColor: "#3478F6",
-                            },
-                        }}
-                    >
-                        Tornar al partit
-                    </Button>
                     <Button
                         variant="contained"
                         startIcon={

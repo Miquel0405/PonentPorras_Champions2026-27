@@ -437,7 +437,10 @@ function ParticipanteInfo({ participante }) {
                     <Box
                         sx={{
                             display: "grid",
-                            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                            gridTemplateColumns: {
+                                xs: "minmax(0, 1fr)",
+                                sm: "repeat(2, minmax(0, 1fr))",
+                            },
                             gap: 1.5,
                         }}
                     >
@@ -479,6 +482,7 @@ function ParticipanteInfo({ participante }) {
                                                     alignItems: "center",
                                                     gap: 1,
                                                     minWidth: 0,
+                                                    flex: 1,
                                                 }}
                                             >
                                                 <EscudoEquipo equipo={equipo} size={32} />
@@ -486,13 +490,14 @@ function ParticipanteInfo({ participante }) {
                                                     sx={{
                                                         color: "#07152F",
                                                         fontWeight: 700,
+                                                        minWidth: 0,
                                                         overflowWrap: "anywhere",
                                                     }}
                                                 >
                                                     {equipo.nombre}
                                                 </Typography>
                                             </Box>
-                                            <Box sx={{ textAlign: "right" }}>
+                                            <Box sx={{ textAlign: "right", flexShrink: 0 }}>
                                                 <Typography
                                                     sx={{
                                                         color: destacado.color,
@@ -531,7 +536,10 @@ function ParticipanteInfo({ participante }) {
                     <Box
                         sx={{
                             display: "grid",
-                            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                            gridTemplateColumns: {
+                                xs: "minmax(0, 1fr)",
+                                sm: "repeat(2, minmax(0, 1fr))",
+                            },
                             gap: 1.5,
                         }}
                     >
@@ -562,18 +570,21 @@ function ParticipanteInfo({ participante }) {
                                         alignItems: "center",
                                         justifyContent: "space-between",
                                         gap: 1,
+                                        minWidth: 0,
                                     }}
                                 >
                                     <Typography
                                         sx={{
                                             color: "#07152F",
                                             fontWeight: 700,
+                                            minWidth: 0,
+                                            flex: 1,
                                             overflowWrap: "anywhere",
                                         }}
                                     >
                                         {destacado.jornada?.jornada}
                                     </Typography>
-                                    <Box sx={{ textAlign: "right" }}>
+                                    <Box sx={{ textAlign: "right", flexShrink: 0 }}>
                                         <Typography
                                             sx={{
                                                 color: destacado.color,
@@ -608,7 +619,10 @@ function ParticipanteInfo({ participante }) {
                     <Box
                         sx={{
                             display: "grid",
-                            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                            gridTemplateColumns: {
+                                xs: "minmax(0, 1fr)",
+                                sm: "repeat(2, minmax(0, 1fr))",
+                            },
                             gap: 1.5,
                         }}
                     >
@@ -641,18 +655,21 @@ function ParticipanteInfo({ participante }) {
                                             justifyContent: "space-between",
                                             gap: 2,
                                             minWidth: 0,
+                                            flexWrap: { xs: "wrap", sm: "nowrap" },
                                         }}
                                     >
                                         <Typography
                                             sx={{
                                                 color: "#07152F",
                                                 fontWeight: 700,
+                                                minWidth: 0,
+                                                flex: 1,
                                                 overflowWrap: "anywhere",
                                             }}
                                         >
                                             {formatearDia(destacado.dia?.dia)} ({destacado.dia?.fases.join(", ")})
                                         </Typography>
-                                        <Box sx={{ textAlign: "right" }}>
+                                        <Box sx={{ textAlign: "right", flexShrink: 0 }}>
                                             <Typography
                                                 sx={{
                                                     color: destacado.color,

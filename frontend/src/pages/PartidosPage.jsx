@@ -4,14 +4,11 @@ import {
     CircularProgress,
     Paper,
     Typography,
-    Stack,
-    Button,
 } from "@mui/material";
-import BackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
 
 import { getPartidos } from "../api/api";
+import PageBackButton from "../components/common/PageBackButton";
 import Partidos from "../components/partidos/Partidos";
 
 function PartidosPage() {
@@ -32,60 +29,26 @@ function PartidosPage() {
     }, []);
 
     return (
-       
         <Box>
-             <Stack
-                direction={{ xs: "column", sm: "row" }}
-                alignItems={{ xs: "stretch", sm: "center" }}
-                justifyContent="space-between"
-                spacing={2}
-                sx={{ mb: 3, position: "relative"}}
-            >
-                <Box sx={{ mb: 3 }}>
-                    <Typography
-                        component="h1"
-                        sx={{
-                            mb: 0.75,
-                            color: "#FFFFFF",
-                            fontSize: { xs: "1.6rem", md: "2rem" },
-                            fontWeight: 800,
-                            lineHeight: 1.2,
-                        }}
-                    >
-                        Partits
-                    </Typography>
-
-                    <Typography sx={{ color: "#eaf1ffdb", fontSize: "0.95rem" }}>
-                        Consulta el calendari complet de la competició, els resultats o accedeix a un partit concret per veure els detalls i les porres.
-                    </Typography>
-                </Box>
-                <Box
+            <PageBackButton to="/">Tornar al inici</PageBackButton>
+            <Box sx={{ mb: 3 }}>
+                <Typography
+                    component="h1"
                     sx={{
-                        position : "absolute",
-                        top: 0,
-                        right: 0,
+                        mb: 0.75,
+                        color: "#FFFFFF",
+                        fontSize: { xs: "1.6rem", md: "2rem" },
+                        fontWeight: 800,
+                        lineHeight: 1.2,
                     }}
                 >
-                    <Button
-                        component={Link}
-                        to="/"
-                        variant="outlined"
-                        startIcon={<BackIcon />}
-                        sx={{
-                            color: "#F3F6FC",
-                            borderColor: "#123C82",
-                            borderRadius: "8px",
-                            textTransform: "none",
-                            fontWeight: 700,
-                            "&:hover": {
-                                backgroundColor: "#3478F6",
-                            },
-                        }}
-                    >
-                        Tornar al inici
-                    </Button>
-                </Box>
-            </Stack>
+                    Partits
+                </Typography>
+
+                <Typography sx={{ color: "#eaf1ffdb", fontSize: "0.95rem" }}>
+                    Consulta el calendari complet de la competició, els resultats o accedeix a un partit concret per veure els detalls i les porres.
+                </Typography>
+            </Box>
 
             <Paper
                 elevation={0}
