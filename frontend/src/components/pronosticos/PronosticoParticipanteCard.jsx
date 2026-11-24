@@ -46,38 +46,42 @@ function PronosticoParticipanteCard({ pronostico }) {
             >
                 <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
                     <Stack
-                        direction="row"
-                        alignItems="center"
-                        spacing={2}
+                        direction={{ xs: "column", md: "row" }}
+                        alignItems={{ xs: "stretch", md: "center" }}
+                        spacing={{ xs: 1.5, md: 2 }}
                     >
                         <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Stack direction="row" alignItems="center" spacing={1}>
-                                <EscudoEquipo equipo={partido.equipo_local} size={28} />
-                                <Typography
-                                    sx={{
-                                        color: "#07152F",
-                                        fontWeight: 700,
-                                        fontSize: "0.9rem",
-                                        overflowWrap: "anywhere",
-                                    }}
-                                >
-                                    {partido.equipo_local.nombre}
-                                </Typography>
-                            </Stack>
-
-                            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.5 }}>
-                                <EscudoEquipo equipo={partido.equipo_visitante} size={28} />
-                                <Typography
-                                    sx={{
-                                        color: "#07152F",
-                                        fontWeight: 700,
-                                        fontSize: "0.9rem",
-                                        overflowWrap: "anywhere",
-                                    }}
-                                >
-                                    {partido.equipo_visitante.nombre}
-                                </Typography>
-                            </Stack>
+                            {[partido.equipo_local, partido.equipo_visitante].map(
+                                (equipo, index) => (
+                                    <Stack
+                                        key={equipo.id ?? index}
+                                        direction="row"
+                                        alignItems="center"
+                                        spacing={1}
+                                        sx={{ minWidth: 0, mt: index ? 0.5 : 0 }}
+                                    >
+                                        <EscudoEquipo equipo={equipo} size={28} />
+                                        <Typography
+                                            sx={{
+                                                minWidth: 0,
+                                                flex: 1,
+                                                color: "#07152F",
+                                                fontWeight: 700,
+                                                fontSize: {
+                                                    xs: "clamp(0.7rem, 3.6vw, 0.9rem)",
+                                                    md: "0.9rem",
+                                                },
+                                                lineHeight: 1.35,
+                                                whiteSpace: "nowrap",
+                                                overflowX: "auto",
+                                                scrollbarWidth: "thin",
+                                            }}
+                                        >
+                                            {equipo.nombre}
+                                        </Typography>
+                                    </Stack>
+                                )
+                            )}
 
 
                             <Typography
@@ -147,10 +151,12 @@ function PronosticoParticipanteCard({ pronostico }) {
                         <Box
                             sx={{
                                 minWidth: 55,
-                                textAlign: "center",
+                                textAlign: { xs: "left", md: "center" },
                                 flexShrink: 0,
-                                pl: 1.5,
-                                borderLeft: "1px solid #E1E7F0",
+                                pl: { xs: 0, md: 1.5 },
+                                pt: { xs: 1, md: 0 },
+                                borderLeft: { xs: 0, md: "1px solid #E1E7F0" },
+                                borderTop: { xs: "1px solid #E1E7F0", md: 0 },
                             }}
                         >
                             <EmojiEventsIcon

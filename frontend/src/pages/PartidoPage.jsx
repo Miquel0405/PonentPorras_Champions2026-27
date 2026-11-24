@@ -6,11 +6,11 @@ import {
 } from "@mui/material";
 
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import BackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { getPartido } from "../api/api";
+import PageBackButton from "../components/common/PageBackButton";
 import PartidoBanner from "../components/partidos/PartidoBanner";
 import PartidoPorras from "../components/partidos/PartidoPorras";
 
@@ -58,50 +58,30 @@ function PartidoPage() {
 
     return (
         <Box>
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    gap: 1,
-                    mb: 2,
-                }}
+            <PageBackButton
+                to="/partidos"
+                actions={
+                    <Button
+                        component={Link}
+                        to={`/partidos/${partidoId}/editar`}
+                        variant="contained"
+                        startIcon={<EditOutlinedIcon />}
+                        sx={{
+                            backgroundColor: "#123C82",
+                            borderRadius: "8px",
+                            textTransform: "none",
+                            fontWeight: 700,
+                            "&:hover": {
+                                backgroundColor: "#3478F6",
+                            },
+                        }}
+                    >
+                        Editar Partit
+                    </Button>
+                }
             >
-                <Button
-                    component={Link}
-                    to="/partidos"
-                    variant="outlined"
-                    startIcon={<BackIcon />}
-                    sx={{
-                        color: "#F3F6FC",
-                        borderColor: "#123C82",
-                        borderRadius: "8px",
-                        textTransform: "none",
-                        fontWeight: 700,
-                        "&:hover": {
-                            backgroundColor: "#3478F6",
-                        },
-                    }}
-                >
-                    Tornar als partits
-                </Button>
-                <Button
-                    component={Link}
-                    to={`/partidos/${partidoId}/editar`}
-                    variant="contained"
-                    startIcon={<EditOutlinedIcon />}
-                    sx={{
-                        backgroundColor: "#123C82",
-                        borderRadius: "8px",
-                        textTransform: "none",
-                        fontWeight: 700,
-                        "&:hover": {
-                            backgroundColor: "#3478F6",
-                        },
-                    }}
-                >
-                    Editar Partit
-                </Button>  
-            </Box>
+                Tornar als partits
+            </PageBackButton>
 
             <PartidoBanner partido={partido} />
 

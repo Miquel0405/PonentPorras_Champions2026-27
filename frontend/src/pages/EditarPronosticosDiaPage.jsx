@@ -7,12 +7,12 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { getParticipantes, getPartidos, getPronosticos } from "../api/api";
+import PageBackButton from "../components/common/PageBackButton";
 
 function formatearFecha(fecha) {
     const [year, month, day] = fecha.split("-").map(Number);
@@ -70,12 +70,13 @@ function EditarPronosticosDiaPage() {
 
     return (
         <Box>
+            <PageBackButton to="/partidos">Tornar als partits</PageBackButton>
             <Stack
                 direction={{ xs: "column", sm: "row" }}
                 alignItems={{ xs: "stretch", sm: "center" }}
                 justifyContent="space-between"
                 spacing={2}
-                sx={{ mb: 3, position: "relative"}}
+                sx={{ mb: 3 }}
             >
                 <Box>
                     <Typography
@@ -93,33 +94,6 @@ function EditarPronosticosDiaPage() {
                     </Typography>
                 </Box>
 
-                <Box
-                    sx={{
-                        position : "absolute",
-                        top: 0,
-                        right: 0,
-                    }}
-                >
-                    <Button
-                        component={Link}
-                        to="/partidos"
-                        variant="outlined"
-                        startIcon={<ArrowBackIcon />}
-                        sx={{
-                            backgroundColor: "#123C82",
-                            borderColor: "#F3F6FC",
-                            color: "#F3F6FC",
-                            borderRadius: "8px",
-                            textTransform: "none",
-                            fontWeight: 700,
-                            "&:hover": {
-                                backgroundColor: "#3478F6",
-                            },
-                        }}
-                    >
-                        Tornar als partits
-                    </Button>
-                </Box>
             </Stack>
 
             <Paper

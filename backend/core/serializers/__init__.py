@@ -1,5 +1,6 @@
 from .models_serializers import (
     EquipoSerializer,
+    PalmaresSerializer,
     PartidoRealSerializer,
     ParticipanteSerializer,
     PronosticoSerializer,

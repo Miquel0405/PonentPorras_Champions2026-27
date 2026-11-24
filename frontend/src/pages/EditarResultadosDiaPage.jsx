@@ -8,12 +8,12 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { getPartidos, guardarResultadosDia } from "../api/api";
+import PageBackButton from "../components/common/PageBackButton";
 import EscudoEquipo from "../components/partidos/EscudoEquipo";
 
 function formatearFecha(fecha) {
@@ -162,12 +162,15 @@ function EditarResultadosDiaPage() {
 
     return (
         <Box>
+            <PageBackButton to="/partidos" disabled={guardando}>
+                Tornar als partits
+            </PageBackButton>
             <Stack
                 direction={{ xs: "column", sm: "row" }}
                 alignItems={{ xs: "stretch", sm: "center" }}
                 justifyContent="space-between"
                 spacing={2}
-                sx={{ mb: 3, position: "relative"}}
+                sx={{ mb: 3 }}
             >
                 <Box>
                     <Typography
@@ -190,33 +193,6 @@ function EditarResultadosDiaPage() {
                         {formatearFecha(fecha)}
                     </Typography>
                 </Box>
-                <Box
-                    sx={{
-                        position : "absolute",
-                        top: 0,
-                        right: 0,
-                    }}
-                >
-                    <Button
-                        component={Link}
-                        to="/partidos"
-                        variant="outlined"
-                        startIcon={<ArrowBackIcon />}
-                        disabled={guardando}
-                        sx={{
-                            backgroundColor: "#123C82",
-                            borderColor: "#FFFFFF",
-                            color: "#F3F6FC",
-                            borderRadius: "8px",
-                            textTransform: "none",
-                            fontWeight: 700,
-                            "&:hover": { backgroundColor: "#3478F6" },
-                        }}
-                    >
-                        Tornar als partits
-                    </Button>
-                </Box>
-                
             </Stack>
 
             {error && (
