@@ -1,6 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import {
     Cell,
+    Legend,
     Pie,
     PieChart,
     ResponsiveContainer,
@@ -100,10 +101,6 @@ function DistribPuntosParticipante({ participante = {} }) {
                                     cx="50%"
                                     cy="48%"
                                     outerRadius="76%"
-                                    label={({ name, percent }) =>
-                                        `${name} ${(percent * 100).toFixed(0)}%`
-                                    }
-                                    labelLine={false}
                                 >
                                     {datos.map((resultado) => (
                                         <Cell
@@ -112,6 +109,19 @@ function DistribPuntosParticipante({ participante = {} }) {
                                         />
                                     ))}
                                 </Pie>
+                                <Legend
+                                    layout="vertical"
+                                    align="left"
+                                    verticalAlign="bottom"
+                                    iconType="circle"
+                                    iconSize={10}
+                                    wrapperStyle={{
+                                        left: 12,
+                                        bottom: 8,
+                                        fontSize: "0.85rem",
+                                        lineHeight: "20px",
+                                    }}
+                                />
                                 <Tooltip
                                     formatter={(value, name) => [
                                         `${value} (${((value / totalPuntos) * 100).toFixed(1)}%)`,
